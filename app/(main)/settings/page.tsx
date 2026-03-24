@@ -238,6 +238,37 @@ export default function SettingsPage() {
     }
   };
 
+  const isOwner = members.some(
+    (m) => m.user_id === user?.id && m.role === "owner"
+  ) || tripMembers.some(
+    (m) => m.user_id === user?.id && m.role === "owner"
+  );
+
+  const handleRemoveMember = async (targetUserId: string, targetName: string) => {
+    if (!currentTrip) return;
+    if (!confirm(`確定要移除「${targetName}」嗎？`)) return;
+
+    try {
+      const res = await fetch("/api/trip-members", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          trip_id: currentTrip.id,
+          user_id: targetUserId,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "移除失敗");
+
+      toast.success(`已移除「${targetName}」`);
+      loadMembers();
+      await refreshTrip();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "移除失敗";
+      toast.error(message);
+    }
+  };
+
   const handleCopyLink = () => {
     if (!currentTrip) return;
     const link = `${window.location.origin}/trip/${currentTrip.id}/join`;
@@ -431,6 +462,15 @@ export default function SettingsPage() {
                   <span className="text-[10px] text-muted-foreground">
                     {m.role === "owner" ? "建立者" : "成員"}
                   </span>
+                  {isOwner && m.role !== "owner" && (
+                    <button
+                      onClick={() => handleRemoveMember(m.user_id, m.profile?.display_name || "成員")}
+                      className="p-1 text-slate-300 hover:text-red-500 transition-colors"
+                      aria-label={`移除${m.profile?.display_name || "成員"}`}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
