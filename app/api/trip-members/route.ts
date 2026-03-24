@@ -16,6 +16,18 @@ export async function GET(req: NextRequest) {
 
     const admin = createAdminClient();
 
+    // 確認用戶是此旅程的成員
+    const { data: membership } = await admin
+      .from("trip_members")
+      .select("trip_id")
+      .eq("trip_id", tripId)
+      .eq("user_id", user.id)
+      .single();
+
+    if (!membership) {
+      return NextResponse.json({ error: "無權限" }, { status: 403 });
+    }
+
     const { data: members, error } = await admin
       .from("trip_members")
       .select("*, profile:profiles(*)")

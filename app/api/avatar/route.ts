@@ -15,7 +15,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "缺少檔案" }, { status: 400 });
     }
 
-    const ext = file.name.split(".").pop() || "jpg";
+    const ALLOWED_MIME_TYPES = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!ALLOWED_MIME_TYPES.includes(file.type)) {
+      return NextResponse.json({ error: "只允許上傳圖片（jpg、png、gif、webp）" }, { status: 400 });
+    }
+
+    const MIME_TO_EXT: Record<string, string> = {
+      "image/jpeg": "jpg",
+      "image/png": "png",
+      "image/gif": "gif",
+      "image/webp": "webp",
+    };
+    const ext = MIME_TO_EXT[file.type];
     const path = `${user.id}.${ext}`;
     const buffer = Buffer.from(await file.arrayBuffer());
 

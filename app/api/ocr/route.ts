@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { recognizeReceipt } from "@/lib/gemini";
+import { getRequestUser } from "@/lib/supabase/auth-helper";
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await getRequestUser(request);
+    if (!user) {
+      return NextResponse.json({ error: "請先登入" }, { status: 401 });
+    }
+
     const { image, mimeType } = await request.json();
 
     if (!image || !mimeType) {

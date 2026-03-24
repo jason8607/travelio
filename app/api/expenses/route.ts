@@ -77,7 +77,21 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { trip_id, ...expenseData } = body;
+    const {
+      trip_id,
+      title,
+      title_ja,
+      amount_jpy,
+      amount_twd,
+      exchange_rate,
+      category,
+      payment_method,
+      location,
+      store_name,
+      store_name_ja,
+      expense_date,
+      receipt_image_url,
+    } = body;
 
     if (!trip_id) {
       return NextResponse.json({ error: "缺少 trip_id" }, { status: 400 });
@@ -99,9 +113,20 @@ export async function POST(req: NextRequest) {
     const { data: expense, error } = await admin
       .from("expenses")
       .insert({
-        ...expenseData,
         trip_id,
-        paid_by: expenseData.paid_by || user.id,
+        paid_by: user.id,
+        title,
+        title_ja,
+        amount_jpy,
+        amount_twd,
+        exchange_rate,
+        category,
+        payment_method,
+        location,
+        store_name,
+        store_name_ja,
+        expense_date,
+        receipt_image_url,
       })
       .select()
       .single();

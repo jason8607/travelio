@@ -58,7 +58,7 @@ export async function PUT(req: NextRequest) {
       .eq("user_id", user.id)
       .single();
 
-    if (!member) {
+    if (!member || member.role !== "owner") {
       return NextResponse.json({ error: "無權限" }, { status: 403 });
     }
 

@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { syncExpenseToNotion } from "@/lib/notion";
-import { createClient } from "@supabase/supabase-js";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { getRequestUser } from "@/lib/supabase/auth-helper";
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await getRequestUser(request);
+    if (!user) {
+      return NextResponse.json({ error: "請先登入" }, { status: 401 });
+    }
+
     const { expenseId, notionToken, databaseId } = await request.json();
 
     if (!expenseId || !notionToken || !databaseId) {
@@ -13,10 +19,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    );
+    const supabase = createAdminClient();
 
     const { data: expense, error } = await supabase
       .from("expenses")
@@ -31,6 +34,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 確認用戶是此消費所屬旅程的成員
+    const { data: member } = await supabase
+      .from("trip_members")
+      .select("trip_id")
+      .eq("trip_id", expense.trip_id)
+      .eq("user_id", user.id)
+      .single();
+
+    if (!member) {
+      return NextResponse.json({ error: "無權限" }, { status: 403 });
+    }
+
     const notionPageId = await syncExpenseToNotion(
       expense,
       notionToken,
@@ -40,7 +55,8 @@ export async function POST(request: NextRequest) {
     await supabase
       .from("expenses")
       .update({ notion_page_id: notionPageId })
-      .eq("id", expenseId);
+      .eq("id", expenseId)
+      .eq("trip_id", expense.trip_id);
 
     return NextResponse.json({ success: true, notionPageId });
   } catch (error: unknown) {
