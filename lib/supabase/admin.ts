@@ -6,8 +6,8 @@ let adminClient: SupabaseClient<any, "public", any> | null = null;
 export function createAdminClient() {
   if (adminClient) return adminClient;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
 
   if (!url || !serviceRoleKey) {
     throw new Error("Missing SUPABASE_SERVICE_ROLE_KEY");
