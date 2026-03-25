@@ -17,6 +17,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [duplicateEmail, setDuplicateEmail] = useState(false);
   const router = useRouter();
   const supabase = createClient();
 
@@ -50,9 +51,16 @@ export default function LoginPage() {
         });
         if (error) throw error;
         if (!data.user?.identities?.length) {
-          throw new Error("此 Email 已被註冊，請直接登入");
+          setDuplicateEmail(true);
+          setIsSignUp(false);
+          return;
         }
-        toast.success("註冊成功！請查看信箱驗證郵件");
+        if (data.user && !data.session) {
+          toast.success("註冊成功！請查看信箱驗證郵件");
+        } else if (data.session) {
+          router.push("/");
+          router.refresh();
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -116,6 +124,17 @@ export default function LoginPage() {
           <Separator className="flex-1" />
         </div>
 
+        {/* Duplicate email hint */}
+        {duplicateEmail && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+            <p className="font-medium mb-1">此 Email 已被註冊</p>
+            <p className="text-xs text-amber-700">
+              如果你之前是用 Google 登入，請點上方「使用 Google 登入」。
+              如果是用 Email 註冊的，請在下方直接登入。
+            </p>
+          </div>
+        )}
+
         {/* Email Login */}
         {!showEmail ? (
           <button
@@ -176,7 +195,7 @@ export default function LoginPage() {
 
             <div className="mt-3 text-center text-xs">
               <button
-                onClick={() => setIsSignUp(!isSignUp)}
+                onClick={() => { setIsSignUp(!isSignUp); setDuplicateEmail(false); }}
                 className="text-blue-500 hover:underline"
               >
                 {isSignUp ? "已有帳號？登入" : "還沒有帳號？註冊"}
