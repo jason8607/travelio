@@ -22,6 +22,7 @@ export function InstallPrompt() {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setShowPrompt(true);
+      localStorage.setItem("install_prompt_dismissed", "true");
     };
 
     window.addEventListener("beforeinstallprompt", handler);
