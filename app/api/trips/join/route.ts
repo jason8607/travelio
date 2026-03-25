@@ -44,12 +44,13 @@ export async function POST(req: NextRequest) {
     });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error("trips/join insert error:", error.message);
+      return NextResponse.json({ error: "加入旅程失敗" }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, trip_name: trip.name });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "伺服器錯誤";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("trips/join error:", err);
+    return NextResponse.json({ error: "伺服器錯誤" }, { status: 500 });
   }
 }

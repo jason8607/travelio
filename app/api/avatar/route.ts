@@ -45,8 +45,9 @@ export async function POST(req: NextRequest) {
       });
 
     if (uploadError) {
+      console.error("avatar upload error:", uploadError.message);
       return NextResponse.json(
-        { error: uploadError.message },
+        { error: "頭像上傳失敗" },
         { status: 500 }
       );
     }
@@ -65,7 +66,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ avatarUrl });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "上傳失敗";
-    return NextResponse.json({ error: message }, { status: 500 });
+    console.error("avatar error:", err);
+    return NextResponse.json({ error: "上傳失敗" }, { status: 500 });
   }
 }

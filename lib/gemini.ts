@@ -63,7 +63,7 @@ export async function recognizeReceipt(
   ]);
 
   const text = result.response.text();
-  console.log("Gemini raw response:", text.slice(0, 2000));
+  console.log("Gemini response length:", text.length);
 
   let jsonStr = text;
   const fenceMatch = text.match(/```(?:json)?\s*\n?([\s\S]*?)\n?\s*```/);
@@ -85,8 +85,14 @@ export async function recognizeReceipt(
     throw new Error("AI 回應格式不符");
   }
 
-  if (typeof parsed !== "object" || parsed === null || typeof parsed.total !== "number") {
-    console.error("Gemini: unexpected structure:", JSON.stringify(parsed).slice(0, 500));
+  if (
+    typeof parsed !== "object" ||
+    parsed === null ||
+    typeof parsed.total !== "number" ||
+    !Array.isArray(parsed.items) ||
+    typeof parsed.store_name !== "string"
+  ) {
+    console.error("Gemini: unexpected structure, keys:", Object.keys(parsed));
     throw new Error("AI 回應格式不符");
   }
 

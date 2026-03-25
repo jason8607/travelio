@@ -31,7 +31,6 @@ export interface Trip {
   currency: string;
   cash_budget: number | null;
   notion_database_id: string | null;
-  notion_token: string | null;
   created_by: string;
   created_at: string;
 }

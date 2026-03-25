@@ -11,10 +11,15 @@ export async function GET(req: NextRequest) {
 
     const admin = createAdminClient();
 
-    const { data: memberRows } = await admin
+    const { data: memberRows, error: memberError } = await admin
       .from("trip_members")
       .select("trip_id")
       .eq("user_id", user.id);
+
+    if (memberError) {
+      console.error("trips GET member query error:", memberError.message);
+      return NextResponse.json({ error: "載入旅程失敗" }, { status: 500 });
+    }
 
     const tripIds = memberRows?.map((r: { trip_id: string }) => r.trip_id) || [];
 

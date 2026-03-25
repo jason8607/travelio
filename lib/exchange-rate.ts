@@ -31,7 +31,12 @@ export async function getExchangeRate(): Promise<number> {
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
         const parsed: CachedRate = JSON.parse(cached);
-        if (Date.now() - parsed.timestamp < CACHE_DURATION) {
+        if (
+          Date.now() - parsed.timestamp < CACHE_DURATION &&
+          typeof parsed.rate === "number" &&
+          parsed.rate > 0 &&
+          Number.isFinite(parsed.rate)
+        ) {
           return parsed.rate;
         }
       }

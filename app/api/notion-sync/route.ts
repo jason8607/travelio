@@ -69,8 +69,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true, notionPageId });
   } catch (error: unknown) {
     console.error("Notion sync error:", error);
-    const message =
-      error instanceof Error ? error.message : "Notion 同步失敗";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: "Notion 同步失敗" }, { status: 500 });
   }
 }

@@ -13,8 +13,12 @@ interface ExpenseListProps {
 }
 
 function getDayOfWeek(dateStr: string) {
-  const days = ["日", "一", "二", "三", "四", "五", "六"];
-  return days[parseISO(dateStr).getDay()];
+  try {
+    const days = ["日", "一", "二", "三", "四", "五", "六"];
+    return days[parseISO(dateStr).getDay()];
+  } catch {
+    return "?";
+  }
 }
 
 export function ExpenseList({ expenses, groupBy, onDelete }: ExpenseListProps) {
@@ -70,7 +74,7 @@ function groupExpenses(expenses: Expense[], groupBy: "date" | "category") {
     key,
     label:
       groupBy === "date"
-        ? `${format(parseISO(key), "yyyy-MM-dd", { locale: zhTW })}（${getDayOfWeek(key)}）`
+        ? (() => { try { return `${format(parseISO(key), "yyyy-MM-dd", { locale: zhTW })}（${getDayOfWeek(key)}）`; } catch { return key; } })()
         : key,
     expenses: exps,
   }));

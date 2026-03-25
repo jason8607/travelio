@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Camera, Loader2, Upload } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
+import { toast } from "sonner";
 
 interface ReceiptUploadProps {
   onImageSelected: (base64: string, mimeType: string) => void;
@@ -22,9 +23,16 @@ export function ReceiptUpload({
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result as string;
-      setPreview(result);
       const base64 = result.split(",")[1];
+      if (!base64) {
+        toast.error("讀取圖片失敗，請重新選擇");
+        return;
+      }
+      setPreview(result);
       onImageSelected(base64, file.type);
+    };
+    reader.onerror = () => {
+      toast.error("讀取圖片失敗，請重新選擇");
     };
     reader.readAsDataURL(file);
   };

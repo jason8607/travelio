@@ -17,15 +17,18 @@ export function useExpenses() {
   const { currentTrip } = useApp();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchExpenses = useCallback(async () => {
     if (!currentTrip) {
       setExpenses([]);
       setLoading(false);
+      setError(null);
       return;
     }
 
     try {
+      setError(null);
       const res = await fetch(`/api/expenses?trip_id=${currentTrip.id}`);
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
@@ -35,6 +38,7 @@ export function useExpenses() {
       setExpenses(data.expenses || []);
     } catch (err) {
       console.error("Failed to load expenses:", err);
+      setError(err instanceof Error ? err.message : "載入失敗");
     } finally {
       setLoading(false);
     }
@@ -74,6 +78,7 @@ export function useExpenses() {
   return {
     expenses,
     loading,
+    error,
     todayTotal,
     totalJpy,
     totalTwd,

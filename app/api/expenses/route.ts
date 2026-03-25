@@ -214,6 +214,10 @@ export async function PUT(req: NextRequest) {
       }
     }
 
+    if ("amount_jpy" in updates && (typeof updates.amount_jpy !== "number" || updates.amount_jpy < 0)) {
+      return NextResponse.json({ error: "金額必須為非負數" }, { status: 400 });
+    }
+
     const ALLOWED_FIELDS = [
       "title", "title_ja", "amount_jpy", "amount_twd", "exchange_rate",
       "category", "payment_method", "location", "store_name", "store_name_ja",

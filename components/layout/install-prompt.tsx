@@ -22,7 +22,6 @@ export function InstallPrompt() {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       setShowPrompt(true);
-      localStorage.setItem("install_prompt_dismissed", "true");
     };
 
     window.addEventListener("beforeinstallprompt", handler);
@@ -32,11 +31,10 @@ export function InstallPrompt() {
   const handleInstall = async () => {
     if (!deferredPrompt) return;
     await deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === "accepted") {
-      setShowPrompt(false);
-    }
+    await deferredPrompt.userChoice;
+    setShowPrompt(false);
     setDeferredPrompt(null);
+    localStorage.setItem("install_prompt_dismissed", "true");
   };
 
   const handleDismiss = () => {
