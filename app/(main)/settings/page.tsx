@@ -23,7 +23,6 @@ import {
   User,
   Plane,
   Check,
-  ChevronRight,
   UserPlus,
   Copy,
   Pencil,
