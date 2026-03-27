@@ -1,26 +1,29 @@
 # 旅帳 — 日本旅遊記帳 App
 
-AI 收據辨識、即時統計、多人記帳的日本旅遊記帳 PWA。
+AI 收據辨識、即時統計、多人分帳的日本旅遊記帳 PWA。
 
 ## 功能
 
 - **AI 收據辨識** — 拍照上傳日文收據，Gemini AI 自動擷取店名、金額、品項、稅別，翻譯成繁體中文
-- **逐條分類** — 掃描後每個品項可獨立選擇消費類別（餐飲、交通、購物等），也可一鍵全部指定
-- **手動記帳** — 快速新增消費，支援類別、支付方式、店家、地區
-- **即時 Dashboard** — 今日花費、旅程累計、現金預算進度
+- **逐條分帳** — 掃描後每個品項可獨立指定歸屬（自己 / 幫付 / 均分），也可一鍵全部指定
+- **手動記帳** — 快速新增消費，支援 9 種類別（餐飲、交通、購物、住宿、門票、藥品、美妝、衣服、其他）、多種支付方式
+- **分帳模式** — 每筆消費可選「只記自己」或「均分」，按成員檢視個人花費
+- **即時 Dashboard** — 今日花費、旅程累計、預算進度（含金額顯示）、即時匯率
 - **統計分析** — 每日趨勢、分類佔比、支付方式分布、TOP 10 消費
-- **旅程日程** — 根據行程自動判斷消費地區
-- **多人記帳** — 邀請旅伴加入（Email 搜尋），每筆消費可指定歸屬或均分
-- **Notion 同步** — 自動將消費紀錄同步至 Notion Database
-- **PWA** — 安裝到手機桌面，離線也能使用
+- **多旅程管理** — 建立多個旅程並自由切換，全站資料隨當前旅程變動
+- **成員管理** — 透過邀請連結邀請旅伴，旅程建立者可移除成員（消費紀錄自動轉移）
+- **Google 登入** — 支援 Google OAuth 與 Email 註冊登入
+- **個人化頭像** — 預設 Google 頭像，可自訂上傳或選擇動物 emoji
+- **OCR 用量管控** — 每人每日 50 次辨識上限，防止 API 濫用
+- **PWA** — 安裝到手機桌面，支援離線使用
 
 ## 技術棧
 
 - Next.js 16 + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui
-- Supabase (PostgreSQL + Auth + RLS + Realtime)
+- Supabase (PostgreSQL + Auth + RLS + Realtime + Storage)
 - Google Gemini 3 Flash (AI 收據辨識)
 - Recharts (圖表)
-- Notion API (同步)
+- Vercel (部署)
 
 ## 快速開始
 
@@ -51,6 +54,7 @@ supabase/migrations/002_add_split_type.sql
 supabase/migrations/003_add_owner_id.sql
 supabase/migrations/004_find_user_by_email.sql
 supabase/migrations/005_fix_trip_members_rls.sql
+supabase/migrations/006_ocr_usage.sql
 ```
 
 ### 4. 設定 Supabase Auth
@@ -62,7 +66,12 @@ supabase/migrations/005_fix_trip_members_rls.sql
 3. （可選）**Authentication → Providers → Google**：啟用 Google OAuth 並填入 Client ID / Secret
 4. （可選）設定 Custom SMTP 以解除免費方案每小時 3 封驗證信的限制
 
-### 5. 啟動開發伺服器
+### 5. 設定 Supabase Storage
+
+1. **Storage → New bucket**：建立名為 `avatars` 的 bucket（Public）
+2. 設定 bucket policy 允許 authenticated 用戶上傳
+
+### 6. 啟動開發伺服器
 
 ```bash
 npm run dev
@@ -70,13 +79,20 @@ npm run dev
 
 打開 http://localhost:3000
 
+### 7. 部署到 Vercel
+
+```bash
+npx vercel --prod
+```
+
+在 Vercel Dashboard 設定環境變數（同 `.env.local`）。
+
 ## 取得 API Keys
 
 | 服務 | 取得方式 | 費用 |
 |------|---------|------|
 | Supabase | [supabase.com](https://supabase.com) 建立專案 | 免費 |
-| Gemini API | [aistudio.google.com](https://aistudio.google.com) 取得 Key | 免費額度 |
-| Notion | [notion.so/my-integrations](https://notion.so/my-integrations) 建立 Integration | 免費 |
+| Gemini API | [aistudio.google.com](https://aistudio.google.com) 取得 Key | 免費額度（每日有上限）|
 
 ## 專案結構
 
@@ -85,18 +101,27 @@ app/
 ├── (main)/            # 主要頁面（含底部導覽）
 │   ├── page.tsx       # Dashboard 首頁
 │   ├── scan/          # AI 收據掃描
-│   ├── records/       # 消費紀錄列表
+│   ├── records/       # 記帳紀錄列表
 │   ├── stats/         # 統計分析
-│   ├── settings/      # 設定（旅程、成員、Notion）
+│   ├── settings/      # 設定（旅程、成員、個人資料）
 │   └── trip/          # 旅程管理、邀請、加入
 ├── api/               # API Routes
-│   ├── ocr/           # Gemini 收據辨識
-│   ├── expenses/      # 消費 CRUD
+│   ├── ocr/           # Gemini 收據辨識（含用量限制）
+│   ├── expenses/      # 消費 CRUD（含分頁）
 │   ├── trips/         # 旅程管理
-│   └── ...
+│   ├── trip-members/  # 成員管理（含移除與消費轉移）
+│   ├── avatar/        # 頭像上傳
+│   └── exchange-rate/ # 即時匯率
 ├── auth/              # 登入、OAuth callback
-components/            # UI 元件
+components/
+├── expense/           # 消費相關（表單、卡片、類別選擇、支付方式）
+├── scan/              # 收據掃描（上傳、確認、分帳）
+├── stats/             # 圖表（分類、支付、每日趨勢）
+├── layout/            # 頁面框架（Header、Nav、載入畫面、安裝提示）
+└── ui/                # shadcn/ui 基礎元件
+hooks/                 # 自訂 Hooks（消費資料、匯率）
 lib/                   # Supabase client、Gemini、匯率、Context
 types/                 # TypeScript 型別定義
 supabase/migrations/   # 資料庫 schema 與 RLS policy
+proxy.ts               # Next.js 16 Proxy（路由保護、session 管理）
 ```

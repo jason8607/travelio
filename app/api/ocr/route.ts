@@ -1,12 +1,71 @@
 import { NextRequest, NextResponse } from "next/server";
 import { recognizeReceipt } from "@/lib/gemini";
 import { getRequestUser } from "@/lib/supabase/auth-helper";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+const DAILY_LIMIT_PER_USER = 50;
+const MINUTE_LIMIT = 5;
+const rateLimitMap = new Map<string, number[]>();
+
+function isMinuteRateLimited(userId: string): boolean {
+  const now = Date.now();
+  const timestamps = rateLimitMap.get(userId) || [];
+  const recent = timestamps.filter((t) => now - t < 60_000);
+  if (recent.length >= MINUTE_LIMIT) return true;
+  recent.push(now);
+  rateLimitMap.set(userId, recent);
+  return false;
+}
+
+async function checkAndRecordUsage(admin: ReturnType<typeof createAdminClient>, userId: string): Promise<{ allowed: boolean; count: number }> {
+  const today = new Date().toISOString().slice(0, 10);
+
+  const { count, error: countError } = await admin
+    .from("ocr_usage")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", `${today}T00:00:00.000Z`);
+
+  if (countError) {
+    console.error("ocr_usage count error:", countError.message);
+    return { allowed: true, count: 0 };
+  }
+
+  const current = count ?? 0;
+  if (current >= DAILY_LIMIT_PER_USER) {
+    return { allowed: false, count: current };
+  }
+
+  const { error: insertError } = await admin.from("ocr_usage").insert({ user_id: userId });
+  if (insertError) {
+    console.error("ocr_usage insert error:", insertError.message);
+  }
+
+  return { allowed: true, count: current + 1 };
+}
 
 export async function POST(request: NextRequest) {
   try {
     const user = await getRequestUser(request);
     if (!user) {
       return NextResponse.json({ error: "請先登入" }, { status: 401 });
+    }
+
+    if (isMinuteRateLimited(user.id)) {
+      return NextResponse.json(
+        { error: "辨識太頻繁，請稍後再試" },
+        { status: 429 }
+      );
+    }
+
+    const admin = createAdminClient();
+
+    const { allowed } = await checkAndRecordUsage(admin, user.id);
+    if (!allowed) {
+      return NextResponse.json(
+        { error: `今日辨識已達上限（${DAILY_LIMIT_PER_USER} 次），明天再試` },
+        { status: 429 }
+      );
     }
 
     const { image, mimeType } = await request.json();

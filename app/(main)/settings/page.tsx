@@ -22,7 +22,6 @@ import {
   LogOut,
   User,
   Plane,
-  Link2,
   Check,
   ChevronRight,
   UserPlus,
@@ -54,8 +53,6 @@ export default function SettingsPage() {
   const [displayName, setDisplayName] = useState(profile?.display_name || "");
   const [avatarEmoji, setAvatarEmoji] = useState(profile?.avatar_emoji || "🧑");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile?.avatar_url || null);
-  const [notionToken, setNotionToken] = useState("");
-  const [notionDbId, setNotionDbId] = useState("");
   const [saving, setSaving] = useState(false);
 
   // Trip editing
@@ -88,17 +85,16 @@ export default function SettingsPage() {
       setTripStart(currentTrip.start_date);
       setTripEnd(currentTrip.end_date);
       setTripBudget(currentTrip.cash_budget?.toString() || "");
-      loadMembers();
+      loadMembers(currentTrip.id);
     }
   }, [currentTrip?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const loadMembers = async () => {
-    if (!currentTrip) return;
+  const loadMembers = async (tripId: string) => {
     try {
-      const res = await fetch(`/api/trip-members?trip_id=${currentTrip.id}`);
+      const res = await fetch(`/api/trip-members?trip_id=${tripId}`);
       if (res.ok) {
         const data = await res.json();
-        if (data.members) setMembers(data.members);
+        if (data.members && currentTrip?.id === tripId) setMembers(data.members);
       }
     } catch {
       // ignore
@@ -148,7 +144,7 @@ export default function SettingsPage() {
       toast.success("個人資料已更新");
       await refreshProfile();
       await refreshTrip();
-      loadMembers();
+      if (currentTrip) loadMembers(currentTrip.id);
     }
     setSaving(false);
   };
@@ -181,25 +177,6 @@ export default function SettingsPage() {
     } finally {
       setSaving(false);
     }
-  };
-
-  const handleSaveNotion = async () => {
-    if (!currentTrip) return;
-    setSaving(true);
-    const { error } = await supabase
-      .from("trips")
-      .update({
-        notion_token: notionToken || null,
-        notion_database_id: notionDbId || null,
-      })
-      .eq("id", currentTrip.id);
-
-    if (error) {
-      toast.error("更新失敗");
-    } else {
-      toast.success("Notion 設定已更新");
-    }
-    setSaving(false);
   };
 
   const handleInvite = async (e: React.FormEvent) => {
@@ -238,7 +215,7 @@ export default function SettingsPage() {
       } else {
         toast.success("已邀請成員加入");
         setInviteEmail("");
-        loadMembers();
+        if (currentTrip) loadMembers(currentTrip.id);
         await refreshTrip();
       }
     } catch (err: unknown) {
@@ -273,7 +250,7 @@ export default function SettingsPage() {
       if (!res.ok) throw new Error(data.error || "移除失敗");
 
       toast.success(`已移除「${targetName}」`);
-      loadMembers();
+      if (currentTrip) loadMembers(currentTrip.id);
       await refreshTrip();
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "移除失敗";
@@ -557,45 +534,6 @@ export default function SettingsPage() {
           </Button>
         </div>
       </div>
-
-      {/* ===== Notion 同步（暫時隱藏） ===== */}
-      {/* <div className="rounded-2xl border bg-white shadow-sm overflow-hidden">
-        <div className="px-4 py-3 border-b border-slate-100">
-          <h2 className="text-sm font-bold flex items-center gap-2">
-            <Link2 className="h-4 w-4 text-slate-500" />
-            Notion 同步
-          </h2>
-        </div>
-        <div className="p-4 space-y-3">
-          <div className="space-y-1.5">
-            <Label className="text-xs text-slate-500">Integration Token</Label>
-            <Input
-              type="password"
-              value={notionToken}
-              onChange={(e) => setNotionToken(e.target.value)}
-              placeholder="secret_..."
-              className="h-10 rounded-lg text-sm"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-xs text-slate-500">Database ID</Label>
-            <Input
-              value={notionDbId}
-              onChange={(e) => setNotionDbId(e.target.value)}
-              placeholder="從 Notion URL 取得"
-              className="h-10 rounded-lg text-sm"
-            />
-          </div>
-          <Button
-            onClick={handleSaveNotion}
-            variant="outline"
-            className="w-full h-10 rounded-lg text-sm"
-            disabled={saving || !currentTrip}
-          >
-            儲存 Notion 設定
-          </Button>
-        </div>
-      </div> */}
 
       <Separator />
 

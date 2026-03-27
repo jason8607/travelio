@@ -81,7 +81,10 @@ export async function recognizeReceipt(
   try {
     parsed = JSON.parse(braceMatch[0]);
   } catch (parseErr) {
-    console.error("Gemini JSON parse error:", parseErr, "\nExtracted:", braceMatch[0].slice(0, 500));
+    console.error("Gemini JSON parse error:", parseErr instanceof Error ? parseErr.message : parseErr);
+    if (process.env.NODE_ENV !== "production") {
+      console.error("Extracted JSON snippet:", braceMatch[0].slice(0, 500));
+    }
     throw new Error("AI 回應格式不符");
   }
 

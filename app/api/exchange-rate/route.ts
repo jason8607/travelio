@@ -18,7 +18,7 @@ export async function GET() {
       const rate = api.extract(data);
       if (rate && rate > 0) {
         cachedRate = { rate, timestamp: Date.now() };
-        return NextResponse.json({ rate, source: api.url });
+        return NextResponse.json({ rate });
       }
     } catch {
       continue;

@@ -12,7 +12,7 @@ import Link from "next/link";
 
 export default function RecordsPage() {
   const { currentTrip, tripMembers, loading: ctxLoading } = useApp();
-  const { expenses, loading, refresh } = useExpenses();
+  const { expenses, loading, error, refresh } = useExpenses();
   const [groupBy, setGroupBy] = useState<"date" | "category" | "member">("date");
 
   const handleDelete = async (id: string) => {
@@ -32,6 +32,15 @@ export default function RecordsPage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <p className="text-sm text-muted-foreground">載入中...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
+        <p className="text-sm text-red-500">載入消費紀錄失敗</p>
+        <button onClick={refresh} className="text-sm text-blue-500 underline">重新載入</button>
       </div>
     );
   }

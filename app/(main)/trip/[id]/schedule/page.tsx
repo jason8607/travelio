@@ -21,25 +21,39 @@ export default function SchedulePage() {
   const [schedule, setSchedule] = useState<TripSchedule[]>([]);
   const [saving, setSaving] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
 
   useEffect(() => {
     const load = async () => {
-      const { data: t } = await supabase
+      const { data: t, error: tripError } = await supabase
         .from("trips")
         .select("*")
         .eq("id", tripId)
         .single();
-      if (t) setTrip(t);
 
-      const { data: s } = await supabase
+      if (tripError || !t) {
+        setLoadError(true);
+        setLoaded(true);
+        return;
+      }
+
+      setTrip(t);
+
+      const { data: s, error: scheduleError } = await supabase
         .from("trip_schedule")
         .select("*")
         .eq("trip_id", tripId)
         .order("date");
 
+      if (scheduleError) {
+        setLoadError(true);
+        setLoaded(true);
+        return;
+      }
+
       if (s && s.length > 0) {
         setSchedule(s);
-      } else if (t) {
+      } else {
         const days = eachDayOfInterval({
           start: parseISO(t.start_date),
           end: parseISO(t.end_date),
@@ -108,6 +122,18 @@ export default function SchedulePage() {
     return (
       <div className="flex items-center justify-center min-h-[60vh] text-muted-foreground">
         載入中...
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div>
+        <PageHeader title="旅程日程" showBack />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-2">
+          <p className="text-sm text-red-500">載入日程失敗，請返回重試</p>
+          <button onClick={() => router.back()} className="text-sm text-blue-500 underline">返回</button>
+        </div>
       </div>
     );
   }
