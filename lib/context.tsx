@@ -152,11 +152,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    let initDone = false;
+    const initTimeout = setTimeout(() => {
+      if (!initDone) {
+        console.warn("init timeout — forcing loading=false");
+        setLoading(false);
+      }
+    }, 8000);
+
     const init = async () => {
       try {
+        console.log("[init] getUser...");
         const {
           data: { user: u },
         } = await supabase.auth.getUser();
+        console.log("[init] getUser done, user:", !!u);
         setUser(u);
 
         if (u) {
@@ -167,6 +177,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           }
           setIsGuest(false);
 
+          console.log("[init] fetching profile...");
           const { data: p } = await supabase
             .from("profiles")
             .select("*")
@@ -174,8 +185,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
             .single();
           if (p) setProfile(p);
 
+          console.log("[init] fetching trips...");
           try {
             const res = await fetch("/api/trips");
+            console.log("[init] trips response:", res.status);
             if (res.ok) {
               const data = await res.json();
               const fetchedTrips = data.trips || [];
@@ -205,6 +218,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       } catch (err) {
         console.error("init error:", err);
       } finally {
+        initDone = true;
+        clearTimeout(initTimeout);
         setLoading(false);
       }
     };
