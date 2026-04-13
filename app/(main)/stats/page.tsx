@@ -1,16 +1,38 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { useApp } from "@/lib/context";
 import { useExpenses } from "@/hooks/use-expenses";
 import { CategoryChart } from "@/components/stats/category-chart";
 import { PaymentChart } from "@/components/stats/payment-chart";
-import { DailyTrend } from "@/components/stats/daily-trend";
 import { TopExpenses } from "@/components/stats/top-expenses";
 import { CashbackChart } from "@/components/stats/cashback-chart";
+import { DayTabs } from "@/components/stats/day-tabs";
+import { formatJPY, formatTWD } from "@/lib/exchange-rate";
+import { parseISO, format } from "date-fns";
+
+const DAY_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
 
 export default function StatsPage() {
   const { currentTrip, loading: ctxLoading } = useApp();
   const { expenses, loading } = useExpenses();
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const dates = useMemo(() => {
+    const set = new Set(expenses.map((e) => e.expense_date));
+    return [...set].sort();
+  }, [expenses]);
+
+  const filtered = useMemo(
+    () =>
+      selectedDate
+        ? expenses.filter((e) => e.expense_date === selectedDate)
+        : expenses,
+    [expenses, selectedDate]
+  );
+
+  const totalJpy = filtered.reduce((s, e) => s + e.amount_jpy, 0);
+  const totalTwd = filtered.reduce((s, e) => s + e.amount_twd, 0);
 
   if (loading || ctxLoading) {
     return (
@@ -38,17 +60,43 @@ export default function StatsPage() {
     );
   }
 
+  const dateLabel = selectedDate
+    ? (() => {
+        const d = parseISO(selectedDate);
+        return `${format(d, "M/d")}(${DAY_LABELS[d.getDay()]})`;
+      })()
+    : null;
+
   return (
     <div className="space-y-4 p-4 pb-4">
-      <CategoryChart expenses={expenses} />
-      <PaymentChart expenses={expenses} />
-      <CashbackChart expenses={expenses} />
-      <DailyTrend
-        expenses={expenses}
-        startDate={currentTrip.start_date}
-        endDate={currentTrip.end_date}
+      <DayTabs dates={dates} selected={selectedDate} onChange={setSelectedDate} />
+
+      <div className="rounded-2xl border bg-white p-4 shadow-sm text-center">
+        <p className="text-xs text-muted-foreground mb-1">
+          {dateLabel ? `${dateLabel} 花費` : "全部花費"}
+        </p>
+        <p className="text-2xl font-bold">{formatJPY(totalJpy)}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">
+          ≈ {formatTWD(totalTwd)} · {filtered.length} 筆
+        </p>
+      </div>
+
+      <CategoryChart
+        expenses={filtered}
+        title={dateLabel ? `${dateLabel} 分類支出` : "分類支出"}
       />
-      <TopExpenses expenses={expenses} />
+
+      <PaymentChart
+        expenses={filtered}
+        title={dateLabel ? `${dateLabel} 支付方式` : "支付方式"}
+      />
+
+      <TopExpenses
+        expenses={filtered}
+        title={dateLabel ? `${dateLabel} 花費排名` : "花費排名"}
+      />
+
+      <CashbackChart expenses={expenses} />
     </div>
   );
 }

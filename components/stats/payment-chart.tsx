@@ -7,9 +7,10 @@ import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
 
 interface PaymentChartProps {
   expenses: Expense[];
+  title?: string;
 }
 
-export function PaymentChart({ expenses }: PaymentChartProps) {
+export function PaymentChart({ expenses, title = "支付方式" }: PaymentChartProps) {
   const total = expenses.reduce((s, e) => s + e.amount_jpy, 0);
   if (total === 0) return null;
 
@@ -30,7 +31,7 @@ export function PaymentChart({ expenses }: PaymentChartProps) {
 
   return (
     <div className="rounded-2xl border bg-white p-4 shadow-sm">
-      <h3 className="font-bold mb-3">支付方式</h3>
+      <h3 className="font-bold mb-3">{title}</h3>
       <div className="flex items-center gap-4">
         <div className="shrink-0 w-28 h-28">
           <ResponsiveContainer width="100%" height="100%">

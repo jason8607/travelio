@@ -5,9 +5,10 @@ import type { Expense } from "@/types";
 
 interface TopExpensesProps {
   expenses: Expense[];
+  title?: string;
 }
 
-export function TopExpenses({ expenses }: TopExpensesProps) {
+export function TopExpenses({ expenses, title = "花費排名" }: TopExpensesProps) {
   const sorted = [...expenses]
     .sort((a, b) => b.amount_jpy - a.amount_jpy)
     .slice(0, 10);
@@ -16,7 +17,7 @@ export function TopExpenses({ expenses }: TopExpensesProps) {
 
   return (
     <div className="rounded-2xl border bg-white p-4 shadow-sm">
-      <h3 className="font-bold mb-3">花費金額前十名</h3>
+      <h3 className="font-bold mb-3">{title}</h3>
       <div className="space-y-2">
         {sorted.map((expense, index) => (
           <div
@@ -32,7 +33,7 @@ export function TopExpenses({ expenses }: TopExpensesProps) {
                 {expense.expense_date} · {expense.store_name || expense.category}
               </p>
             </div>
-            <div className="text-right flex-shrink-0">
+            <div className="text-right shrink-0">
               <p className="font-bold">{formatJPY(expense.amount_jpy)}</p>
               <p className="text-[10px] text-muted-foreground">
                 {formatTWD(expense.amount_twd)}
