@@ -22,7 +22,6 @@ export interface Trip {
   currency: string;
   cash_budget: number | null;
   budget_jpy: number | null;
-  notion_database_id: string | null;
   created_by: string;
   created_at: string;
 }
@@ -64,7 +63,6 @@ export interface Expense {
   input_currency: "JPY" | "TWD";
   note: string | null;
   receipt_image_url: string | null;
-  notion_page_id: string | null;
   created_at: string;
   profile?: Profile;
   items?: ExpenseItem[];

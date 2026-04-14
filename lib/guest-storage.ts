@@ -19,7 +19,6 @@ export function initGuestTrip(): Trip {
     currency: "JPY",
     cash_budget: null,
     budget_jpy: null,
-    notion_database_id: null,
     created_by: "guest",
     created_at: new Date().toISOString(),
   };
@@ -121,7 +120,6 @@ export function addGuestExpense(data: {
     input_currency: data.input_currency || "JPY",
     note: data.note ?? null,
     receipt_image_url: null,
-    notion_page_id: null,
     created_at: new Date().toISOString(),
   };
   expenses.unshift(expense);
