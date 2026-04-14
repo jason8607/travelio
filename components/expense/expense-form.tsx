@@ -73,6 +73,9 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
   const [creditCardId, setCreditCardId] = useState<string | null>(
     editExpense?.credit_card_id || null
   );
+  const [creditCardPlanId, setCreditCardPlanId] = useState<string | null>(
+    editExpense?.credit_card_plan_id || null
+  );
   const [note, setNote] = useState(editExpense?.note || "");
   const [showReceiptImage, setShowReceiptImage] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -98,6 +101,7 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
       const twd = currency === "TWD" ? inputAmount : jpyToTwd(inputAmount, rate);
 
       const cardId = paymentMethod === "信用卡" ? creditCardId : null;
+      const planId = paymentMethod === "信用卡" ? creditCardPlanId : null;
       const resolvedOwnerId =
         splitType === "personal" && ownerId === null
           ? (user?.id ?? paidBy)
@@ -116,6 +120,7 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
             location: location || null,
             expense_date: expenseDate,
             credit_card_id: cardId,
+            credit_card_plan_id: planId,
             input_currency: currency,
             note: note || null,
           });
@@ -133,6 +138,7 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
             location: location || null,
             expense_date: expenseDate,
             credit_card_id: cardId,
+            credit_card_plan_id: planId,
             input_currency: currency,
             note: note || null,
           });
@@ -162,6 +168,7 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
             expense_date: expenseDate,
             split_type: splitType,
             credit_card_id: cardId,
+            credit_card_plan_id: planId,
             input_currency: currency,
             note: note || null,
           }),
@@ -189,6 +196,7 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
             expense_date: expenseDate,
             split_type: splitType,
             credit_card_id: cardId,
+            credit_card_plan_id: planId,
             input_currency: currency,
             note: note || null,
           }),
@@ -355,11 +363,19 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
           value={paymentMethod}
           onChange={(m) => {
             setPaymentMethod(m);
-            if (m !== "信用卡") setCreditCardId(null);
+            if (m !== "信用卡") {
+              setCreditCardId(null);
+              setCreditCardPlanId(null);
+            }
           }}
         />
         {paymentMethod === "信用卡" && (
-          <CreditCardPicker value={creditCardId} onChange={setCreditCardId} />
+          <CreditCardPicker
+            value={creditCardId}
+            onChange={setCreditCardId}
+            planValue={creditCardPlanId}
+            onPlanChange={setCreditCardPlanId}
+          />
         )}
       </div>
 

@@ -31,6 +31,7 @@ interface ReceiptConfirmProps {
     items: ReceiptItemWithOwner[];
     paymentMethod: PaymentMethod;
     creditCardId: string | null;
+    creditCardPlanId: string | null;
     storeName: string;
     storeNameJa: string;
     date: string;
@@ -56,6 +57,7 @@ export function ReceiptConfirm({
   );
 
   const [creditCardId, setCreditCardId] = useState<string | null>(null);
+  const [creditCardPlanId, setCreditCardPlanId] = useState<string | null>(null);
 
   const [items, setItems] = useState<ReceiptItemWithOwner[]>(
     initialResult.items.map((item) => ({
@@ -348,11 +350,19 @@ export function ReceiptConfirm({
           value={paymentMethod}
           onChange={(m) => {
             setPaymentMethod(m);
-            if (m !== "信用卡") setCreditCardId(null);
+            if (m !== "信用卡") {
+              setCreditCardId(null);
+              setCreditCardPlanId(null);
+            }
           }}
         />
         {paymentMethod === "信用卡" && (
-          <CreditCardPicker value={creditCardId} onChange={setCreditCardId} />
+          <CreditCardPicker
+            value={creditCardId}
+            onChange={setCreditCardId}
+            planValue={creditCardPlanId}
+            onPlanChange={setCreditCardPlanId}
+          />
         )}
       </div>
 
@@ -362,6 +372,7 @@ export function ReceiptConfirm({
             items,
             paymentMethod,
             creditCardId: paymentMethod === "信用卡" ? creditCardId : null,
+            creditCardPlanId: paymentMethod === "信用卡" ? creditCardPlanId : null,
             storeName,
             storeNameJa,
             date,

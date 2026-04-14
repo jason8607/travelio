@@ -56,6 +56,7 @@ export default function ScanPage() {
     items: ReceiptItemWithOwner[];
     paymentMethod: PaymentMethod;
     creditCardId: string | null;
+    creditCardPlanId: string | null;
     storeName: string;
     storeNameJa: string;
     date: string;
@@ -113,6 +114,7 @@ export default function ScanPage() {
               expense_date: expenseDate,
               split_type: item.split_type,
               credit_card_id: data.creditCardId,
+              credit_card_plan_id: data.creditCardPlanId,
               receipt_image_url: receiptImageUrl,
             }),
           });

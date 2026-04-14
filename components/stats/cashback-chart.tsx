@@ -25,21 +25,74 @@ export function CashbackChart({ expenses }: CashbackChartProps) {
       const cardExpenses = creditExpenses.filter(
         (e) => e.credit_card_id === card.id
       );
-      const totalTwd = cardExpenses.reduce((s, e) => s + e.amount_twd, 0);
-      const cashbackEarned = Math.round(totalTwd * card.cashback_rate / 100);
+
+      const hasPlans = card.plans && card.plans.length > 0;
+
+      // Calculate per-plan breakdown if plans exist
+      let planBreakdown: {
+        planId: string;
+        planName: string;
+        rate: number;
+        totalTwd: number;
+        cashback: number;
+      }[] = [];
+
+      let totalCashback = 0;
+      let totalTwd = 0;
+
+      if (hasPlans) {
+        planBreakdown = card.plans!.map((plan) => {
+          const planExpenses = cardExpenses.filter(
+            (e) => e.credit_card_plan_id === plan.id
+          );
+          const planTwd = planExpenses.reduce((s, e) => s + e.amount_twd, 0);
+          const cashback = Math.round(planTwd * plan.cashback_rate / 100);
+          return {
+            planId: plan.id,
+            planName: plan.name,
+            rate: plan.cashback_rate,
+            totalTwd: planTwd,
+            cashback,
+          };
+        });
+
+        // Also account for card expenses without a plan assigned
+        const unplannedExpenses = cardExpenses.filter(
+          (e) => !e.credit_card_plan_id
+        );
+        if (unplannedExpenses.length > 0) {
+          const unplannedTwd = unplannedExpenses.reduce((s, e) => s + e.amount_twd, 0);
+          planBreakdown.push({
+            planId: "__unassigned__",
+            planName: "未指定方案",
+            rate: 0,
+            totalTwd: unplannedTwd,
+            cashback: 0,
+          });
+        }
+
+        totalCashback = planBreakdown.reduce((s, p) => s + p.cashback, 0);
+        totalTwd = cardExpenses.reduce((s, e) => s + e.amount_twd, 0);
+      } else {
+        totalTwd = cardExpenses.reduce((s, e) => s + e.amount_twd, 0);
+        totalCashback = Math.round(totalTwd * card.cashback_rate / 100);
+      }
+
       const progress = Math.min(
-        (cashbackEarned / card.cashback_limit) * 100,
+        (totalCashback / card.cashback_limit) * 100,
         100
       );
-      const isMaxed = cashbackEarned >= card.cashback_limit;
+      const isMaxed = totalCashback >= card.cashback_limit;
 
       return {
         card,
         totalTwd,
-        cashbackEarned,
+        cashbackEarned: totalCashback,
         progress,
         isMaxed,
         txCount: cardExpenses.length,
+        hasPlans,
+        planBreakdown,
       };
     });
   }, [cards, expenses]);
@@ -67,15 +120,17 @@ export function CashbackChart({ expenses }: CashbackChartProps) {
       </div>
 
       <div className="space-y-4">
-        {cardStats.map(({ card, totalTwd, cashbackEarned, progress, isMaxed, txCount }) => (
+        {cardStats.map(({ card, totalTwd, cashbackEarned, progress, isMaxed, txCount, hasPlans, planBreakdown }) => (
           <div key={card.id} className="space-y-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <span className="text-base">💳</span>
                 <span className="text-sm font-medium">{card.name}</span>
-                <span className="text-[10px] text-slate-400">
-                  {card.cashback_rate}%
-                </span>
+                {!hasPlans && (
+                  <span className="text-[10px] text-slate-400">
+                    {card.cashback_rate}%
+                  </span>
+                )}
               </div>
               <div className="text-right">
                 <span
@@ -114,6 +169,30 @@ export function CashbackChart({ expenses }: CashbackChartProps) {
                 </span>
               )}
             </div>
+
+            {/* Plan breakdown */}
+            {hasPlans && planBreakdown.length > 0 && (
+              <div className="pl-2 space-y-1 border-l-2 border-slate-100 ml-1">
+                {planBreakdown
+                  .filter((p) => p.totalTwd > 0)
+                  .map((p) => (
+                    <div key={p.planId} className="flex items-center justify-between text-[11px]">
+                      <span className="text-slate-500">
+                        {p.planName}
+                        {p.rate > 0 && <span className="text-slate-400 ml-1">{p.rate}%</span>}
+                      </span>
+                      <span className="text-slate-500">
+                        NT${p.totalTwd.toLocaleString()}
+                        {p.cashback > 0 && (
+                          <span className="text-blue-500 ml-1">
+                            +NT${p.cashback.toLocaleString()}
+                          </span>
+                        )}
+                      </span>
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
         ))}
       </div>

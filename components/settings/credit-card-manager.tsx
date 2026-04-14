@@ -17,6 +17,12 @@ import { CreditCard as CreditCardIcon, Plus, Pencil, Trash2, X } from "lucide-re
 import { useCreditCards } from "@/hooks/use-credit-cards";
 import type { CreditCard } from "@/types";
 
+interface PlanDraft {
+  id?: string;
+  name: string;
+  rate: string;
+}
+
 export function CreditCardManager() {
   const { cards, addCard, updateCard, deleteCard } = useCreditCards();
   const [showForm, setShowForm] = useState(false);
@@ -27,11 +33,13 @@ export function CreditCardManager() {
   const [name, setName] = useState("");
   const [rate, setRate] = useState("");
   const [limit, setLimit] = useState("");
+  const [plans, setPlans] = useState<PlanDraft[]>([]);
 
   const resetForm = () => {
     setName("");
     setRate("");
     setLimit("");
+    setPlans([]);
     setEditingCard(null);
     setShowForm(false);
   };
@@ -41,7 +49,22 @@ export function CreditCardManager() {
     setName(card.name);
     setRate(String(card.cashback_rate));
     setLimit(String(card.cashback_limit));
+    setPlans(
+      card.plans?.map((p) => ({ id: p.id, name: p.name, rate: String(p.cashback_rate) })) || []
+    );
     setShowForm(true);
+  };
+
+  const addPlan = () => {
+    setPlans([...plans, { name: "", rate: "" }]);
+  };
+
+  const removePlan = (index: number) => {
+    setPlans(plans.filter((_, i) => i !== index));
+  };
+
+  const updatePlan = (index: number, field: keyof PlanDraft, value: string) => {
+    setPlans(plans.map((p, i) => (i === index ? { ...p, [field]: value } : p)));
   };
 
   const handleSave = async () => {
@@ -49,24 +72,50 @@ export function CreditCardManager() {
       toast.error("請輸入卡片名稱");
       return;
     }
-    const rateNum = parseFloat(rate);
     const limitNum = parseFloat(limit);
-    if (isNaN(rateNum) || rateNum <= 0) {
-      toast.error("請輸入有效的回饋 %");
-      return;
-    }
     if (isNaN(limitNum) || limitNum <= 0) {
       toast.error("請輸入有效的回饋上限");
       return;
     }
 
+    const hasPlans = plans.length > 0;
+
+    if (!hasPlans) {
+      const rateNum = parseFloat(rate);
+      if (isNaN(rateNum) || rateNum <= 0) {
+        toast.error("請輸入有效的回饋 %");
+        return;
+      }
+    }
+
+    // Validate plans
+    if (hasPlans) {
+      for (let i = 0; i < plans.length; i++) {
+        if (!plans[i].name.trim()) {
+          toast.error(`方案 ${i + 1} 名稱不得為空`);
+          return;
+        }
+        const pr = parseFloat(plans[i].rate);
+        if (isNaN(pr) || pr <= 0) {
+          toast.error(`方案「${plans[i].name}」的回饋 % 必須大於 0`);
+          return;
+        }
+      }
+    }
+
     setSaving(true);
     try {
+      const cardRate = hasPlans ? 0 : parseFloat(rate);
+      const planData = hasPlans
+        ? plans.map((p) => ({ id: p.id, name: p.name.trim(), cashback_rate: parseFloat(p.rate) }))
+        : undefined;
+
       if (editingCard) {
         const updated = await updateCard(editingCard.id, {
           name: name.trim(),
-          cashback_rate: rateNum,
+          cashback_rate: cardRate,
           cashback_limit: limitNum,
+          plans: planData as CreditCard["plans"],
         });
         if (updated) {
           toast.success("已更新信用卡");
@@ -77,8 +126,9 @@ export function CreditCardManager() {
       } else {
         const card = await addCard({
           name: name.trim(),
-          cashback_rate: rateNum,
+          cashback_rate: cardRate,
           cashback_limit: limitNum,
+          plans: planData as CreditCard["plans"],
         });
         if (card) {
           toast.success("已新增信用卡");
@@ -102,6 +152,16 @@ export function CreditCardManager() {
     } else {
       toast.error("刪除失敗");
     }
+  };
+
+  const getCardRateDisplay = (card: CreditCard) => {
+    if (card.plans && card.plans.length > 0) {
+      const rates = card.plans.map((p) => p.cashback_rate);
+      const min = Math.min(...rates);
+      const max = Math.max(...rates);
+      return min === max ? `${min}%` : `${min}~${max}%`;
+    }
+    return `${card.cashback_rate}%`;
   };
 
   return (
@@ -143,8 +203,20 @@ export function CreditCardManager() {
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">{card.name}</p>
                 <p className="text-[11px] text-muted-foreground">
-                  回饋 {card.cashback_rate}% · 上限 NT${card.cashback_limit.toLocaleString()}
+                  回饋 {getCardRateDisplay(card)} · 上限 NT${card.cashback_limit.toLocaleString()}
                 </p>
+                {card.plans && card.plans.length > 0 && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {card.plans.map((plan) => (
+                      <span
+                        key={plan.id}
+                        className="text-[10px] px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-600"
+                      >
+                        {plan.name} {plan.cashback_rate}%
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
               <div className="flex items-center gap-1 shrink-0">
                 <button
@@ -188,21 +260,38 @@ export function CreditCardManager() {
               className="h-10 rounded-lg text-sm"
             />
           </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500">回饋 %</Label>
-              <Input
-                type="number"
-                value={rate}
-                onChange={(e) => setRate(e.target.value)}
-                placeholder="例：2.8"
-                step="0.1"
-                min="0"
-                className="h-10 rounded-lg text-sm"
-              />
+
+          {plans.length === 0 && (
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-500">回饋 %</Label>
+                <Input
+                  type="number"
+                  value={rate}
+                  onChange={(e) => setRate(e.target.value)}
+                  placeholder="例：2.8"
+                  step="0.1"
+                  min="0"
+                  className="h-10 rounded-lg text-sm"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs text-slate-500">回饋上限 (NT$)</Label>
+                <Input
+                  type="number"
+                  value={limit}
+                  onChange={(e) => setLimit(e.target.value)}
+                  placeholder="例：500"
+                  min="0"
+                  className="h-10 rounded-lg text-sm"
+                />
+              </div>
             </div>
+          )}
+
+          {plans.length > 0 && (
             <div className="space-y-1.5">
-              <Label className="text-xs text-slate-500">回饋上限 (NT$)</Label>
+              <Label className="text-xs text-slate-500">回饋上限 (NT$，所有方案共用)</Label>
               <Input
                 type="number"
                 value={limit}
@@ -212,7 +301,61 @@ export function CreditCardManager() {
                 className="h-10 rounded-lg text-sm"
               />
             </div>
+          )}
+
+          {/* Plans section */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label className="text-xs text-slate-500">
+                可切方案 {plans.length > 0 && `(${plans.length})`}
+              </Label>
+              <button
+                type="button"
+                onClick={addPlan}
+                className="text-[11px] text-blue-500 flex items-center gap-0.5"
+              >
+                <Plus className="h-3 w-3" />
+                新增方案
+              </button>
+            </div>
+
+            {plans.length === 0 && (
+              <p className="text-[11px] text-slate-400">
+                如果這張卡有多個回饋方案可切換，點新增方案來設定
+              </p>
+            )}
+
+            {plans.map((plan, i) => (
+              <div key={i} className="flex items-center gap-2">
+                <Input
+                  value={plan.name}
+                  onChange={(e) => updatePlan(i, "name", e.target.value)}
+                  placeholder="方案名稱"
+                  className="h-9 rounded-lg text-sm flex-1"
+                />
+                <div className="relative w-24 shrink-0">
+                  <Input
+                    type="number"
+                    value={plan.rate}
+                    onChange={(e) => updatePlan(i, "rate", e.target.value)}
+                    placeholder="回饋%"
+                    step="0.1"
+                    min="0"
+                    className="h-9 rounded-lg text-sm pr-6"
+                  />
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">%</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removePlan(i)}
+                  className="p-1 text-slate-400 hover:text-red-500 transition-colors shrink-0"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            ))}
           </div>
+
           <Button
             onClick={handleSave}
             className="w-full h-10 bg-blue-500 hover:bg-blue-600 rounded-lg text-sm"
