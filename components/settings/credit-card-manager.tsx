@@ -1,21 +1,21 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { CreditCard as CreditCardIcon, Plus, Pencil, Trash2, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { useCreditCards } from "@/hooks/use-credit-cards";
 import type { CreditCard } from "@/types";
+import { CreditCard as CreditCardIcon, Pencil, Plus, Trash2, X } from "lucide-react";
+import { useState } from "react";
+import { toast } from "sonner";
 
 interface PlanDraft {
   id?: string;
@@ -256,7 +256,7 @@ export function CreditCardManager() {
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="例：台新 FlyGo、玉山 UBear"
+              placeholder="例：台新 Richart、玉山 UBear"
               className="h-10 rounded-lg text-sm"
             />
           </div>
