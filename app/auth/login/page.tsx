@@ -18,6 +18,7 @@ export default function LoginPage() {
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
   const [duplicateEmail, setDuplicateEmail] = useState(false);
+  const [duplicateEmailAddress, setDuplicateEmailAddress] = useState("");
   const router = useRouter();
   const supabase = createClient();
 
@@ -52,6 +53,7 @@ export default function LoginPage() {
         if (error) throw error;
         if (!data.user?.identities?.length) {
           setDuplicateEmail(true);
+          setDuplicateEmailAddress(email);
           setIsSignUp(false);
           return;
         }
@@ -67,12 +69,15 @@ export default function LoginPage() {
           password,
         });
         if (error) throw error;
-        router.push("/");
-        router.refresh();
+        window.location.href = "/";
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "發生錯誤";
-      toast.error(message);
+      if (message === "Invalid login credentials") {
+        toast.error("帳號或密碼錯誤，請重新輸入");
+      } else {
+        toast.error(message);
+      }
     } finally {
       setLoading(false);
     }
@@ -128,10 +133,28 @@ export default function LoginPage() {
         {duplicateEmail && (
           <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
             <p className="font-medium mb-1">此 Email 已被註冊</p>
-            <p className="text-xs text-amber-700">
-              如果你之前是用 Google 登入，請點上方「使用 Google 登入」。
-              如果是用 Email 註冊的，請在下方直接登入。
+            <p className="text-xs text-amber-700 mb-2">
+              此信箱已透過 Google 登入註冊。你可以先用 Google 登入，再設定密碼來啟用信箱登入。
             </p>
+            <button
+              onClick={async () => {
+                setLoading(true);
+                const { error } = await supabase.auth.signInWithOAuth({
+                  provider: "google",
+                  options: {
+                    redirectTo: `${window.location.origin}/auth/callback?next=/auth/set-password`,
+                  },
+                });
+                if (error) {
+                  toast.error(error.message);
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="w-full h-9 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-medium transition-colors disabled:opacity-60"
+            >
+              使用 Google 登入並設定密碼
+            </button>
           </div>
         )}
 
