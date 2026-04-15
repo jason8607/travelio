@@ -4,6 +4,7 @@ import { useMemo, useRef, useState } from "react";
 import { useApp } from "@/lib/context";
 import { useExpenses } from "@/hooks/use-expenses";
 import { useCategories } from "@/hooks/use-categories";
+import { useCreditCards } from "@/hooks/use-credit-cards";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
 import { exportExpensesToCSV } from "@/lib/export";
 import { calculateSettlements } from "@/lib/settlement";
@@ -19,6 +20,7 @@ import {
   Receipt,
   Camera,
   Loader2,
+  CreditCard as CreditCardIcon,
 } from "lucide-react";
 import { differenceInDays, parseISO, format } from "date-fns";
 import dynamic from "next/dynamic";
@@ -34,6 +36,7 @@ export default function SummaryPage() {
   const { currentTrip, tripMembers, isGuest, loading: ctxLoading } = useApp();
   const { expenses, loading } = useExpenses();
   const { categories } = useCategories();
+  const { cards } = useCreditCards();
   const captureRef = useRef<HTMLDivElement>(null);
   const [capturing, setCapturing] = useState(false);
 
@@ -116,6 +119,34 @@ export default function SummaryPage() {
     // Settlement
     const { settlements } = calculateSettlements(expenses, tripMembers);
 
+    // Credit card cashback
+    const creditExpenses = expenses.filter((e) => e.payment_method === "信用卡");
+    const cardStats = cards
+      .map((card) => {
+        const cardExps = creditExpenses.filter((e) => e.credit_card_id === card.id);
+        if (cardExps.length === 0) return null;
+
+        let cashback = 0;
+        const totalTwdCard = cardExps.reduce((s, e) => s + e.amount_twd, 0);
+
+        if (card.plans && card.plans.length > 0) {
+          for (const plan of card.plans) {
+            const planTwd = cardExps
+              .filter((e) => e.credit_card_plan_id === plan.id)
+              .reduce((s, e) => s + e.amount_twd, 0);
+            cashback += Math.round((planTwd * plan.cashback_rate) / 100);
+          }
+        } else {
+          cashback = Math.round((totalTwdCard * card.cashback_rate) / 100);
+        }
+
+        const capped = card.cashback_limit > 0 ? Math.min(cashback, card.cashback_limit) : cashback;
+        return { name: card.name, totalTwd: totalTwdCard, cashback: capped, limit: card.cashback_limit };
+      })
+      .filter((c): c is NonNullable<typeof c> => c !== null);
+
+    const totalCashback = cardStats.reduce((s, c) => s + c.cashback, 0);
+
     // Budget usage
     const budgetUsed = currentTrip.budget_jpy
       ? Math.round((totalJpy / currentTrip.budget_jpy) * 100)
@@ -141,8 +172,10 @@ export default function SummaryPage() {
       settlements,
       budgetUsed,
       budgetJpy: currentTrip.budget_jpy,
+      cardStats,
+      totalCashback,
     };
-  }, [currentTrip, expenses, categories, tripMembers]);
+  }, [currentTrip, expenses, categories, tripMembers, cards]);
 
   async function handleCaptureImage() {
     const el = captureRef.current;
@@ -474,6 +507,48 @@ export default function SummaryPage() {
                 <ArrowRight className="h-3 w-3 text-amber-500" />
                 <span className="text-amber-700">{s.toName}</span>
                 <UserAvatar avatarUrl={s.toAvatarUrl} avatarEmoji={s.toEmoji} size="xs" />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Credit card cashback */}
+      {stats.cardStats.length > 0 && (
+        <div className="rounded-2xl border bg-white p-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <CreditCardIcon className="h-4 w-4 text-blue-500" />
+            <h3 className="font-bold text-sm">信用卡回饋</h3>
+            <span className="ml-auto font-bold text-sm text-blue-600">
+              {formatTWD(stats.totalCashback)}
+            </span>
+          </div>
+          <div className="space-y-2">
+            {stats.cardStats.map((card) => (
+              <div key={card.name} className="space-y-1">
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-slate-700">{card.name}</span>
+                  <span className="font-medium text-emerald-600">
+                    +{formatTWD(card.cashback)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>刷卡 {formatTWD(card.totalTwd)}</span>
+                  {card.limit > 0 && (
+                    <span>
+                      上限 {formatTWD(card.limit)}
+                      {card.cashback >= card.limit && " · 已達上限"}
+                    </span>
+                  )}
+                </div>
+                {card.limit > 0 && (
+                  <div className="h-1.5 rounded-full bg-slate-100">
+                    <div
+                      className={`h-1.5 rounded-full transition-all ${card.cashback >= card.limit ? "bg-amber-400" : "bg-emerald-400"}`}
+                      style={{ width: `${Math.min(Math.round((card.cashback / card.limit) * 100), 100)}%` }}
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>
