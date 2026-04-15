@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useApp } from "@/lib/context";
 import { useExpenses } from "@/hooks/use-expenses";
 import { useCategories } from "@/hooks/use-categories";
@@ -17,6 +17,8 @@ import {
   Download,
   ArrowRight,
   Receipt,
+  Camera,
+  Loader2,
 } from "lucide-react";
 import { differenceInDays, parseISO, format } from "date-fns";
 import dynamic from "next/dynamic";
@@ -32,6 +34,8 @@ export default function SummaryPage() {
   const { currentTrip, tripMembers, isGuest, loading: ctxLoading } = useApp();
   const { expenses, loading } = useExpenses();
   const { categories } = useCategories();
+  const captureRef = useRef<HTMLDivElement>(null);
+  const [capturing, setCapturing] = useState(false);
 
   const stats = useMemo(() => {
     if (!currentTrip || expenses.length === 0) return null;
@@ -140,6 +144,93 @@ export default function SummaryPage() {
     };
   }, [currentTrip, expenses, categories, tripMembers]);
 
+  async function handleCaptureImage() {
+    const el = captureRef.current;
+    if (!el || !currentTrip) return;
+    setCapturing(true);
+    try {
+      // Convert avatar images to base64 data URLs to avoid CORS issues
+      const images = el.querySelectorAll("img");
+      const restoreFns: (() => void)[] = [];
+
+      await Promise.all(
+        Array.from(images).map(async (img) => {
+          // Extract original URL from next/image proxy
+          let originalUrl = img.src;
+          const match = originalUrl.match(/\/_next\/image\?url=([^&]+)/);
+          if (match) originalUrl = decodeURIComponent(match[1]);
+
+          try {
+            const dataUrl = await new Promise<string>((resolve, reject) => {
+              const tmp = new window.Image();
+              tmp.crossOrigin = "anonymous";
+              tmp.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = tmp.naturalWidth || 64;
+                canvas.height = tmp.naturalHeight || 64;
+                const ctx = canvas.getContext("2d")!;
+                ctx.drawImage(tmp, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+              };
+              tmp.onerror = () => reject(new Error("load failed"));
+              tmp.src = originalUrl;
+            });
+
+            const prevSrc = img.src;
+            const prevSrcset = img.srcset;
+            img.src = dataUrl;
+            img.srcset = "";
+            restoreFns.push(() => {
+              img.src = prevSrc;
+              img.srcset = prevSrcset;
+            });
+          } catch {
+            // If image fails to load, hide it so capture doesn't break
+            const prevDisplay = img.style.display;
+            img.style.display = "none";
+            restoreFns.push(() => { img.style.display = prevDisplay; });
+          }
+        })
+      );
+
+      const { toPng } = await import("html-to-image");
+      const dataUrl = await toPng(el, {
+        pixelRatio: 2,
+        quality: 1,
+        backgroundColor: "#f8fafc",
+      });
+
+      // Restore original image srcs
+      restoreFns.forEach((fn) => fn());
+
+      const res = await fetch(dataUrl);
+      const blob = await res.blob();
+
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], "trip-summary.png", { type: "image/png" });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: `${currentTrip.name} 旅行總結` });
+          setCapturing(false);
+          return;
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.download = `${currentTrip.name}-總結.png`;
+      link.href = url;
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success("圖片已儲存");
+    } catch (err) {
+      console.error("Summary capture error:", err);
+      const msg = err instanceof Error ? err.message : typeof err === "string" ? err : JSON.stringify(err);
+      toast.error(`圖片產生失敗：${msg}`);
+    } finally {
+      setCapturing(false);
+    }
+  }
+
   if (loading || ctxLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -170,13 +261,18 @@ export default function SummaryPage() {
 
   return (
     <div className="space-y-4 p-4 pb-8">
-      {/* Header */}
+      {/* Back button — outside capturable area */}
       <div className="text-center relative">
-        <div className="flex items-center justify-center gap-2 mb-1">
-          <Link href="/" className="text-sm text-blue-500 absolute left-0">
-            ← 返回
-          </Link>
-        </div>
+        <Link href="/" className="text-sm text-blue-500 absolute left-0 top-0">
+          ← 返回
+        </Link>
+        <div className="h-5" />
+      </div>
+
+      {/* Capturable content area */}
+      <div ref={captureRef} className="space-y-4 bg-slate-50 rounded-2xl p-4">
+      {/* Header */}
+      <div className="text-center">
         <div className="flex items-center justify-center gap-2">
           <Plane className="h-5 w-5 text-blue-500" />
           <h1 className="text-xl font-bold">{currentTrip.name}</h1>
@@ -383,6 +479,30 @@ export default function SummaryPage() {
           </div>
         </div>
       )}
+
+      </div>{/* End capturable content */}
+
+      {/* Save as image */}
+      <button
+        onClick={handleCaptureImage}
+        disabled={capturing}
+        className="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 shadow-sm transition-colors disabled:opacity-60"
+      >
+        {capturing ? (
+          <Loader2 className="h-4 w-4 animate-spin" />
+        ) : (
+          <Camera className="h-4 w-4" />
+        )}
+        {capturing ? "產生中..." : "儲存為圖片"}
+      </button>
+
+      {/* Recap link */}
+      <Link
+        href="/recap"
+        className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 py-3 text-sm font-medium text-white shadow-sm transition-colors"
+      >
+        ✨ 查看旅後回顧
+      </Link>
 
       {/* Export button */}
       <button
