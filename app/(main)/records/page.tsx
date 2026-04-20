@@ -151,7 +151,7 @@ export default function RecordsPage() {
         <ExpenseList expenses={filtered} groupBy={groupBy} onDelete={handleDelete} />
       )}
 
-      <div className="fixed bottom-20 right-4 z-40">
+      <div className="fixed right-4 z-40 bottom-[calc(5rem+env(safe-area-inset-bottom))]">
         <Link
           href="/records/new"
           aria-label="新增消費"
