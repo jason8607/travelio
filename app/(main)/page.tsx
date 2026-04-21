@@ -231,7 +231,10 @@ export default function HomePage() {
       )}
 
       {/* FAB */}
-      <div className="fixed right-4 z-40 bottom-[calc(5rem+env(safe-area-inset-bottom))]">
+      <div
+        className="fixed right-4 z-40"
+        style={{ bottom: "calc(5rem + env(safe-area-inset-bottom))" }}
+      >
         <Link
           href="/records/new"
           aria-label="新增消費"

@@ -49,7 +49,10 @@ export function InstallPrompt() {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed left-4 right-4 z-50 mx-auto max-w-lg bottom-[calc(5rem+env(safe-area-inset-bottom))]">
+    <div
+      className="fixed left-4 right-4 z-50 mx-auto max-w-lg"
+      style={{ bottom: "calc(5rem + env(safe-area-inset-bottom))" }}
+    >
       <div className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-lg border">
         <div className="text-2xl">📱</div>
         <div className="flex-1">
