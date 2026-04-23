@@ -1,37 +1,36 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import { useApp } from "@/lib/context";
-import { useExpenses } from "@/hooks/use-expenses";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { useCategories } from "@/hooks/use-categories";
 import { useCreditCards } from "@/hooks/use-credit-cards";
+import { useExpenses } from "@/hooks/use-expenses";
+import { useApp } from "@/lib/context";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
 import { exportExpensesToCSV } from "@/lib/export";
 import { calculateSettlements } from "@/lib/settlement";
-import { UserAvatar } from "@/components/ui/user-avatar";
+import { shareOrDownloadImage } from "@/lib/share-image";
+import { differenceInDays, format, parseISO } from "date-fns";
 import {
-  Plane,
-  CalendarDays,
-  TrendingUp,
-  Crown,
-  MapPin,
-  Download,
   ArrowRight,
-  Receipt,
+  CalendarDays,
   Camera,
-  Loader2,
   CreditCard as CreditCardIcon,
+  Crown,
+  Download,
+  Loader2,
+  Plane,
+  Receipt,
+  TrendingUp,
 } from "lucide-react";
-import { differenceInDays, parseISO, format } from "date-fns";
 import dynamic from "next/dynamic";
+import Link from "next/link";
+import { useMemo, useRef, useState } from "react";
+import { toast } from "sonner";
 
 const LazyPieChart = dynamic(
   () => import("@/components/stats/lazy-pie-chart").then((m) => ({ default: m.LazyPieChart })),
   { ssr: false, loading: () => <div className="w-28 h-28 rounded-full bg-muted animate-pulse" /> }
 );
-import { toast } from "sonner";
-import Link from "next/link";
-import { shareOrDownloadImage } from "@/lib/share-image";
 
 export default function SummaryPage() {
   const { currentTrip, tripMembers, isGuest, loading: ctxLoading } = useApp();
@@ -307,7 +306,7 @@ export default function SummaryPage() {
       </div>
 
       {/* Total spending hero card */}
-      <div className="rounded-2xl bg-gradient-to-br from-primary to-primary/90 p-5 text-white shadow-lg">
+      <div className="rounded-2xl bg-linear-to-br from-primary to-primary/90 p-5 text-white shadow-lg">
         <p className="text-sm opacity-80 mb-1">旅程總花費</p>
         <p className="text-3xl font-bold">{formatJPY(stats.totalJpy)}</p>
         <p className="text-sm opacity-80 mt-1">
@@ -565,7 +564,7 @@ export default function SummaryPage() {
       {/* Recap link */}
       <Link
         href="/recap"
-        className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-primary py-3 text-sm font-medium text-white shadow-sm transition-colors"
+        className="w-full flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-rose-500 to-primary py-3 text-sm font-medium text-white shadow-sm transition-colors"
       >
         ✨ 查看旅後回顧
       </Link>

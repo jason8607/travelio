@@ -1,19 +1,19 @@
 "use client";
 
-import { useApp } from "@/lib/context";
-import { useExpenses } from "@/hooks/use-expenses";
-import { useCreditCards } from "@/hooks/use-credit-cards";
-import { useCategories } from "@/hooks/use-categories";
 import { BigSummaryCard } from "@/components/dashboard/big-summary-card";
 import { ExpenseCard } from "@/components/expense/expense-card";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import { useCategories } from "@/hooks/use-categories";
+import { useCreditCards } from "@/hooks/use-credit-cards";
+import { useExpenses } from "@/hooks/use-expenses";
 import { calculateTotalCashback } from "@/lib/cashback";
-import { formatJPY, formatTWD, getExchangeRate, FALLBACK_RATE } from "@/lib/exchange-rate";
+import { useApp } from "@/lib/context";
+import { FALLBACK_RATE, formatJPY, formatTWD, getExchangeRate } from "@/lib/exchange-rate";
 import { deleteGuestExpense } from "@/lib/guest-storage";
-import { Plus } from "lucide-react";
-import Link from "next/link";
-import Image from "next/image";
 import { differenceInDays, parseISO } from "date-fns";
+import { Plus } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -57,7 +57,7 @@ export default function HomePage() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="mb-2 animate-bounce inline-flex">
-            <Image src="/icon-192.png" alt="旅帳" width={48} height={48} priority />
+            <Image src="/icon-transparent.png" alt="旅帳" width={48} height={48} priority />
           </div>
           <p className="text-sm text-muted-foreground">載入中...</p>
         </div>
@@ -69,7 +69,7 @@ export default function HomePage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen px-4">
         <Image
-          src="/icon-192.png"
+          src="/icon-transparent.png"
           alt="旅帳"
           width={72}
           height={72}

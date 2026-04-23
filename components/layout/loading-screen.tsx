@@ -8,7 +8,7 @@ export function LoadingScreen() {
       <div className="text-center">
         <div className="relative">
           <Image
-            src="/icon-192.png"
+            src="/icon-transparent.png"
             alt="旅帳"
             width={80}
             height={80}

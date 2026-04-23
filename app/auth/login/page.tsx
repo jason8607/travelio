@@ -1,15 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
 import { Mail } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [showEmail, setShowEmail] = useState(false);
@@ -19,7 +19,6 @@ export default function LoginPage() {
   const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
   const [duplicateEmail, setDuplicateEmail] = useState(false);
-  const [duplicateEmailAddress, setDuplicateEmailAddress] = useState("");
   const router = useRouter();
   const supabase = createClient();
 
@@ -54,7 +53,6 @@ export default function LoginPage() {
         if (error) throw error;
         if (!data.user?.identities?.length) {
           setDuplicateEmail(true);
-          setDuplicateEmailAddress(email);
           setIsSignUp(false);
           return;
         }
@@ -90,7 +88,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center">
           <div className="mb-3 inline-flex">
-            <Image src="/icon-192.png" alt="旅帳" width={64} height={64} priority />
+            <Image src="/icon-transparent.png" alt="旅帳" width={64} height={64} priority />
           </div>
           <h1 className="text-2xl font-bold text-foreground">旅帳</h1>
           <p className="text-sm text-muted-foreground mt-1">

@@ -1,22 +1,22 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
-import { useApp } from "@/lib/context";
-import { useExpenses } from "@/hooks/use-expenses";
+import type { ExpenseFilterState } from "@/components/expense/expense-filter";
+import { EMPTY_FILTER, ExpenseFilter } from "@/components/expense/expense-filter";
 import { ExpenseList } from "@/components/expense/expense-list";
 import { MemberSummary } from "@/components/expense/member-summary";
 import { SettlementView } from "@/components/expense/settlement-view";
-import { ExpenseFilter, EMPTY_FILTER } from "@/components/expense/expense-filter";
-import type { ExpenseFilterState } from "@/components/expense/expense-filter";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Download } from "lucide-react";
-import { toast } from "sonner";
-import { deleteGuestExpense } from "@/lib/guest-storage";
+import { useExpenses } from "@/hooks/use-expenses";
+import { useApp } from "@/lib/context";
 import { exportExpensesToCSV } from "@/lib/export";
+import { deleteGuestExpense } from "@/lib/guest-storage";
+import { Download, Plus } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export default function RecordsPage() {
-  const { currentTrip, tripMembers, isGuest, loading: ctxLoading, profile } = useApp();
+  const { currentTrip, tripMembers, isGuest, loading: ctxLoading } = useApp();
   const { expenses, loading, error, refresh } = useExpenses();
   const [groupBy, setGroupBy] = useState<"date" | "category" | "member" | "settlement">("date");
   const [filter, setFilter] = useState<ExpenseFilterState>(EMPTY_FILTER);

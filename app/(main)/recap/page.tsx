@@ -1,22 +1,22 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import { useApp } from "@/lib/context";
-import { useExpenses } from "@/hooks/use-expenses";
+import { PageHeader } from "@/components/layout/page-header";
+import { ShareableCard } from "@/components/recap/shareable-card";
+import { StatCard } from "@/components/recap/stat-card";
 import { useCategories } from "@/hooks/use-categories";
 import { useCreditCards } from "@/hooks/use-credit-cards";
+import { useExpenses } from "@/hooks/use-expenses";
+import { useApp } from "@/lib/context";
 import { formatJPY } from "@/lib/exchange-rate";
-import { PageHeader } from "@/components/layout/page-header";
-import { StatCard } from "@/components/recap/stat-card";
-import { ShareableCard } from "@/components/recap/shareable-card";
-import { differenceInDays, parseISO, format } from "date-fns";
+import { shareOrDownloadImage } from "@/lib/share-image";
+import { differenceInDays, format, parseISO } from "date-fns";
 import { Camera, Loader2 } from "lucide-react";
 import Image from "next/image";
+import { useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { shareOrDownloadImage } from "@/lib/share-image";
 
 export default function RecapPage() {
-  const { currentTrip, tripMembers, isGuest, loading: ctxLoading } = useApp();
+  const { currentTrip, tripMembers, loading: ctxLoading } = useApp();
   const { expenses, loading } = useExpenses();
   const { categories } = useCategories();
   const { cards } = useCreditCards();
@@ -172,7 +172,7 @@ export default function RecapPage() {
   if (!currentTrip) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-2 text-muted-foreground">
-        <Image src="/icon-192.png" alt="旅帳" width={56} height={56} />
+        <Image src="/icon-transparent.png" alt="旅帳" width={56} height={56} />
         <span className="text-sm">請先選擇旅程</span>
       </div>
     );
@@ -312,7 +312,7 @@ export default function RecapPage() {
         <button
           onClick={handleCapture}
           disabled={capturing}
-          className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-primary py-3 text-sm font-medium text-white shadow-sm transition-colors disabled:opacity-60"
+          className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary to-primary/90 py-3 text-sm font-medium text-white shadow-sm transition-colors disabled:opacity-60"
         >
           {capturing ? (
             <Loader2 className="h-4 w-4 animate-spin" />
