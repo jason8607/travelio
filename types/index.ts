@@ -121,15 +121,15 @@ export interface OCRResult {
 }
 
 export const DEFAULT_CATEGORIES: CategoryItem[] = [
-  { id: "default-food",     value: "餐飲", label: "餐飲", icon: "🍽️", color: "#F59E0B" },
-  { id: "default-transport", value: "交通", label: "交通", icon: "🚆", color: "#3B82F6" },
-  { id: "default-shopping",  value: "購物", label: "購物", icon: "🛍️", color: "#EC4899" },
-  { id: "default-hotel",     value: "住宿", label: "住宿", icon: "🏨", color: "#10B981" },
-  { id: "default-ticket",    value: "門票", label: "門票", icon: "🎫", color: "#8B5CF6" },
-  { id: "default-medicine",  value: "藥品", label: "藥品", icon: "💊", color: "#EF4444" },
-  { id: "default-beauty",    value: "美妝", label: "美妝", icon: "💄", color: "#F472B6" },
-  { id: "default-clothes",   value: "衣服", label: "衣服", icon: "👕", color: "#A78BFA" },
-  { id: "default-other",     value: "其他", label: "其他", icon: "📦", color: "#6B7280" },
+  { id: "default-food",     value: "餐飲", label: "餐飲", icon: "🍜", color: "#E27A4A" },
+  { id: "default-transport", value: "交通", label: "交通", icon: "🚄", color: "#5E8AB5" },
+  { id: "default-shopping",  value: "購物", label: "購物", icon: "🛍️", color: "#D16B84" },
+  { id: "default-hotel",     value: "住宿", label: "住宿", icon: "🏨", color: "#7AAE8C" },
+  { id: "default-ticket",    value: "門票", label: "門票", icon: "🎫", color: "#9776C4" },
+  { id: "default-medicine",  value: "藥品", label: "藥品", icon: "💊", color: "#C9604F" },
+  { id: "default-beauty",    value: "美妝", label: "美妝", icon: "💄", color: "#D58AA3" },
+  { id: "default-clothes",   value: "衣服", label: "衣服", icon: "👕", color: "#A892C9" },
+  { id: "default-other",     value: "其他", label: "其他", icon: "📦", color: "#8E7C65" },
 ];
 
 /** @deprecated Use useCategories() hook instead */
