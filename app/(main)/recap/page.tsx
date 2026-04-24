@@ -60,11 +60,9 @@ export default function RecapPage() {
   const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [iconDataUrl, setIconDataUrl] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
   const [touch, setTouch] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
     setTouch(isTouchDevice());
     let cancelled = false;
     loadIconDataUrl()
@@ -355,7 +353,6 @@ export default function RecapPage() {
   }
 
   const total = wrapped.cards.length;
-  const touch = isTouchDevice();
   // Mobile uses native share; desktop falls back to clipboard copy.
   const shareSupported = touch ? canShareImage() : canCopyImage();
   const shareLabel = touch ? "分享" : "複製圖片";
@@ -473,7 +470,7 @@ export default function RecapPage() {
             )}
           </div>
 
-          <div className="flex w-full max-w-[340px] gap-3">
+          <div className="flex w-full max-w-85 gap-3">
             <button
               type="button"
               onClick={handleDownload}
