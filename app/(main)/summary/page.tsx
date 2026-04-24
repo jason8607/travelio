@@ -227,10 +227,24 @@ export default function SummaryPage() {
       );
 
       const { toPng } = await import("html-to-image");
+      // Pin the capture dimensions to the element's own box so mobile
+      // viewport scaling / fractional DPR doesn't produce extra gray gutters.
+      const rect = el.getBoundingClientRect();
+      const width = Math.ceil(rect.width);
+      const height = Math.ceil(rect.height);
       const dataUrl = await toPng(el, {
         pixelRatio: 2,
         quality: 1,
         backgroundColor: "#f8fafc",
+        width,
+        height,
+        canvasWidth: width * 2,
+        canvasHeight: height * 2,
+        style: {
+          transform: "none",
+          transformOrigin: "top left",
+          margin: "0",
+        },
       });
 
       // Restore original image srcs

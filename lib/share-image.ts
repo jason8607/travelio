@@ -1,6 +1,11 @@
 export function isTouchDevice(): boolean {
   if (typeof window === "undefined") return false;
-  return window.matchMedia("(pointer: coarse)").matches;
+  // Treat as touch-only when the primary pointer is coarse AND no fine pointer
+  // exists anywhere — avoids misclassifying touchscreen laptops (which still
+  // have a mouse) as mobile and pushing them into the native share sheet.
+  const primaryCoarse = window.matchMedia("(pointer: coarse)").matches;
+  const hasFinePointer = window.matchMedia("(any-pointer: fine)").matches;
+  return primaryCoarse && !hasFinePointer;
 }
 
 export function canCopyImage(): boolean {
