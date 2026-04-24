@@ -85,84 +85,82 @@ export default function RecordsPage() {
   }
 
   return (
-    <div className="pb-4">
-      <div className="px-4 pt-4 mb-4">
-        <div className="flex items-center justify-between mb-1">
-          <Link
-            href="/"
-            className="text-sm text-primary"
-          >
-            ← 返回首頁
-          </Link>
-          {expenses.length > 0 && (
-            <button
-              onClick={() => {
-                exportExpensesToCSV(filtered, currentTrip?.name || "旅程", tripMembers);
-                toast.success("CSV 已下載");
-              }}
-              className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+    <div className="relative flex h-full flex-col">
+      <div className="flex-1 min-h-0 overflow-y-auto pb-4">
+        <div className="px-4 pt-4 mb-4">
+          <div className="flex items-center justify-between mb-1">
+            <Link
+              href="/"
+              className="text-sm text-primary"
             >
-              <Download className="h-3.5 w-3.5" />
-              匯出
-            </button>
-          )}
+              ← 返回首頁
+            </Link>
+            {expenses.length > 0 && (
+              <button
+                onClick={() => {
+                  exportExpensesToCSV(filtered, currentTrip?.name || "旅程", tripMembers);
+                  toast.success("CSV 已下載");
+                }}
+                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Download className="h-3.5 w-3.5" />
+                匯出
+              </button>
+            )}
+          </div>
         </div>
-      </div>
 
-      <div className="px-4 mb-3">
-        <ExpenseFilter
-          onChange={setFilter}
-          total={expenses.length}
-          filtered={filtered.length}
-        />
-      </div>
+        <div className="px-4 mb-3">
+          <ExpenseFilter
+            onChange={setFilter}
+            total={expenses.length}
+            filtered={filtered.length}
+          />
+        </div>
 
-      <div className="px-4 mb-4">
-        <Tabs
-          value={groupBy}
-          onValueChange={(v) => setGroupBy(v as "date" | "category" | "member" | "settlement")}
-        >
-          <TabsList className="w-full">
-            <TabsTrigger value="date" className="flex-1">
-              按日期
-            </TabsTrigger>
-            <TabsTrigger value="category" className="flex-1">
-              按類別
-            </TabsTrigger>
-            {!isGuest && (
-              <TabsTrigger value="member" className="flex-1">
-                按成員
-              </TabsTrigger>
-            )}
-            {!isGuest && (
-              <TabsTrigger value="settlement" className="flex-1">
-                結算
-              </TabsTrigger>
-            )}
-          </TabsList>
-        </Tabs>
-      </div>
-
-      {groupBy === "settlement" ? (
-        <SettlementView expenses={filtered} tripMembers={tripMembers} />
-      ) : groupBy === "member" ? (
-        <MemberSummary expenses={filtered} tripMembers={tripMembers} onDelete={handleDelete} />
-      ) : (
-        <ExpenseList expenses={filtered} groupBy={groupBy} onDelete={handleDelete} />
-      )}
-
-      {/* FAB */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-20 z-40 flex justify-center">
-        <div className="relative w-full max-w-lg">
-          <Link
-            href="/records/new"
-            aria-label="新增消費"
-            className="pointer-events-auto absolute right-4 bottom-0 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-all active:scale-95"
+        <div className="px-4 mb-4">
+          <Tabs
+            value={groupBy}
+            onValueChange={(v) => setGroupBy(v as "date" | "category" | "member" | "settlement")}
           >
-            <Plus className="h-6 w-6" />
-          </Link>
+            <TabsList className="w-full">
+              <TabsTrigger value="date" className="flex-1">
+                按日期
+              </TabsTrigger>
+              <TabsTrigger value="category" className="flex-1">
+                按類別
+              </TabsTrigger>
+              {!isGuest && (
+                <TabsTrigger value="member" className="flex-1">
+                  按成員
+                </TabsTrigger>
+              )}
+              {!isGuest && (
+                <TabsTrigger value="settlement" className="flex-1">
+                  結算
+                </TabsTrigger>
+              )}
+            </TabsList>
+          </Tabs>
         </div>
+
+        {groupBy === "settlement" ? (
+          <SettlementView expenses={filtered} tripMembers={tripMembers} />
+        ) : groupBy === "member" ? (
+          <MemberSummary expenses={filtered} tripMembers={tripMembers} onDelete={handleDelete} />
+        ) : (
+          <ExpenseList expenses={filtered} groupBy={groupBy} onDelete={handleDelete} />
+        )}
       </div>
+
+      {/* FAB — 固定在中間滑動區塊的右下 */}
+      <Link
+        href="/records/new"
+        aria-label="新增消費"
+        className="absolute right-4 bottom-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-all active:scale-95"
+      >
+        <Plus className="h-6 w-6" />
+      </Link>
     </div>
   );
 }
