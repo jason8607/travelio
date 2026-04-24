@@ -124,7 +124,8 @@ export default function HomePage() {
   const recent = expenses.slice(0, 3);
 
   return (
-    <div className="pb-4">
+    <div className="relative flex h-full flex-col">
+      <div className="flex-1 min-h-0 overflow-y-auto pb-6">
       {/* Guest Banner */}
       {isGuest && (
         <div className="mx-4 mt-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 flex items-center justify-between">
@@ -223,18 +224,16 @@ export default function HomePage() {
         )}
       </section>
 
-      {/* FAB */}
-      <div className="pointer-events-none fixed inset-x-0 bottom-20 z-40 flex justify-center">
-        <div className="relative w-full max-w-lg">
-          <Link
-            href="/records/new"
-            aria-label="新增消費"
-            className="pointer-events-auto absolute right-4 bottom-0 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-all active:scale-95"
-          >
-            <Plus className="h-6 w-6" />
-          </Link>
-        </div>
       </div>
+
+      {/* FAB — 固定在中間滑動區塊的右下 */}
+      <Link
+        href="/records/new"
+        aria-label="新增消費"
+        className="absolute right-4 bottom-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-all active:scale-95"
+      >
+        <Plus className="h-6 w-6" />
+      </Link>
     </div>
   );
 }
