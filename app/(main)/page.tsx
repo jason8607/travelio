@@ -161,12 +161,12 @@ export default function HomePage() {
       </header>
 
       {/* 匯率 pill */}
-      <div className="flex justify-center px-4 pb-4">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-card border border-border/60 px-3 py-1 shadow-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-          <span className="text-[10px] text-muted-foreground">JPY 100</span>
-          <span className="text-[10px] text-muted-foreground/60">≈</span>
-          <span className="text-[10px] font-semibold text-foreground">
+      <div className="flex justify-start px-5 pb-4">
+        <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border/60 px-4 py-1.5 shadow-sm">
+          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="text-xs text-muted-foreground">JPY 100</span>
+          <span className="text-xs text-muted-foreground/60">≈</span>
+          <span className="text-sm font-semibold text-foreground">
             TWD {(rate * 100).toFixed(2)}
           </span>
         </div>
