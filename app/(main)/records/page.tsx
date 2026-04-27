@@ -1,56 +1,91 @@
 "use client";
 
-import type { ExpenseFilterState } from "@/components/expense/expense-filter";
-import { EMPTY_FILTER, ExpenseFilter } from "@/components/expense/expense-filter";
-import { ExpenseList } from "@/components/expense/expense-list";
-import { MemberSummary } from "@/components/expense/member-summary";
-import { SettlementView } from "@/components/expense/settlement-view";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCategories } from "@/hooks/use-categories";
 import { useExpenses } from "@/hooks/use-expenses";
 import { useApp } from "@/lib/context";
 import { exportExpensesToCSV } from "@/lib/export";
+import { formatJPY } from "@/lib/exchange-rate";
 import { deleteGuestExpense } from "@/lib/guest-storage";
-import { Download, Plus } from "lucide-react";
+import { differenceInDays, format, parseISO } from "date-fns";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "sonner";
+import type { CategoryItem, Expense } from "@/types";
+
+function categoryLabel(cat: string, categories: CategoryItem[]) {
+  return categories.find((c) => c.value === cat || c.label === cat)?.label ?? cat;
+}
+
+function EditorialRow({
+  expense,
+  index,
+  categories,
+  onDelete,
+}: {
+  expense: Expense;
+  index: number;
+  categories: CategoryItem[];
+  onDelete: (id: string) => void;
+}) {
+  const sub = [categoryLabel(expense.category, categories), expense.store_name]
+    .filter(Boolean)
+    .join(" · ");
+  const date = format(parseISO(expense.expense_date), "MM/dd");
+  return (
+    <div className="ed-row group">
+      <div className="ed-row-num">{String(index + 1).padStart(2, "0")}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="ed-row-tt truncate">{expense.title}</div>
+        <div className="ed-row-sub">{sub || "—"}</div>
+      </div>
+      <div style={{ textAlign: "right" }}>
+        <div className="ed-row-amt">{formatJPY(expense.amount_jpy)}</div>
+        <div className="ed-row-dt">{date}</div>
+      </div>
+      <button
+        onClick={() => onDelete(expense.id)}
+        aria-label="刪除"
+        className="ed-mono"
+        style={{
+          marginLeft: 8,
+          background: "transparent",
+          border: 0,
+          color: "var(--ed-muted)",
+          fontSize: 11,
+          cursor: "pointer",
+          opacity: 0,
+          transition: "opacity 0.15s",
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+        onMouseLeave={(e) => (e.currentTarget.style.opacity = "0")}
+      >
+        ×
+      </button>
+    </div>
+  );
+}
 
 export default function RecordsPage() {
   const { currentTrip, tripMembers, isGuest, loading: ctxLoading } = useApp();
   const { expenses, loading, error, refresh } = useExpenses();
-  const [groupBy, setGroupBy] = useState<"date" | "category" | "member" | "settlement">("date");
-  const [filter, setFilter] = useState<ExpenseFilterState>(EMPTY_FILTER);
+  const { categories } = useCategories();
+  const [activeDay, setActiveDay] = useState<number | "all">("all");
 
-  useEffect(() => {
-    if (isGuest && (groupBy === "member" || groupBy === "settlement")) setGroupBy("date");
-  }, [isGuest]); // eslint-disable-line react-hooks/exhaustive-deps
+  const tripStart = currentTrip ? parseISO(currentTrip.start_date) : null;
+  const tripEnd = currentTrip ? parseISO(currentTrip.end_date) : null;
+  const totalDays = tripStart && tripEnd ? differenceInDays(tripEnd, tripStart) + 1 : 0;
 
   const filtered = useMemo(() => {
-    let result = expenses;
-
-    if (filter.query) {
-      const q = filter.query.toLowerCase();
-      result = result.filter(
-        (e) =>
-          e.title.toLowerCase().includes(q) ||
-          (e.title_ja && e.title_ja.toLowerCase().includes(q)) ||
-          (e.store_name && e.store_name.toLowerCase().includes(q)) ||
-          (e.store_name_ja && e.store_name_ja.toLowerCase().includes(q))
-      );
-    }
-
-    if (filter.categories.length > 0) {
-      result = result.filter((e) => filter.categories.includes(e.category));
-    }
-
-    if (filter.paymentMethods.length > 0) {
-      result = result.filter((e) => filter.paymentMethods.includes(e.payment_method));
-    }
-
-    return result;
-  }, [expenses, filter]);
+    if (activeDay === "all" || !tripStart) return expenses;
+    const targetDate = format(
+      new Date(tripStart.getTime() + (activeDay - 1) * 24 * 60 * 60 * 1000),
+      "yyyy-MM-dd",
+    );
+    return expenses.filter((e) => e.expense_date === targetDate);
+  }, [expenses, activeDay, tripStart]);
 
   const handleDelete = async (id: string) => {
+    if (!confirm("確定要刪除這筆記錄？")) return;
     try {
       if (isGuest) {
         deleteGuestExpense(id);
@@ -69,97 +104,161 @@ export default function RecordsPage() {
 
   if (loading || ctxLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-sm text-muted-foreground">載入中...</p>
+      <div className="flex h-full items-center justify-center">
+        <p className="ed-mono" style={{ fontSize: 11, letterSpacing: 2, color: "var(--ed-muted)" }}>
+          LOADING…
+        </p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <p className="text-sm text-red-500">載入消費紀錄失敗</p>
-        <button onClick={refresh} className="text-sm text-primary underline">重新載入</button>
+      <div className="flex h-full flex-col items-center justify-center gap-3">
+        <p className="ed-serif" style={{ fontSize: 14, color: "var(--ed-vermillion)" }}>
+          載入消費紀錄失敗
+        </p>
+        <button
+          onClick={refresh}
+          className="ed-mono"
+          style={{
+            fontSize: 11,
+            letterSpacing: 2,
+            color: "var(--ed-ink)",
+            textDecoration: "underline",
+            background: "transparent",
+            border: 0,
+            cursor: "pointer",
+          }}
+        >
+          重新載入
+        </button>
       </div>
     );
   }
 
   return (
     <div className="relative flex h-full flex-col">
-      <div className="flex-1 min-h-0 overflow-y-auto pb-4">
-        <div className="px-4 pt-4 mb-4">
-          <div className="flex items-center justify-between mb-1">
-            <Link
-              href="/"
-              className="text-sm text-primary"
-            >
-              ← 返回首頁
-            </Link>
+      <div className="flex-1 min-h-0 overflow-y-auto" style={{ paddingBottom: 96 }}>
+        {/* NavBack */}
+        <div
+          style={{
+            padding: "12px 24px 0",
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Link
+            href="/"
+            className="ed-mono"
+            style={{ fontSize: 10, letterSpacing: 2, color: "var(--ed-muted)", textDecoration: "none" }}
+          >
+            ← 返回首頁
+          </Link>
+          <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
+            <span className="ed-mono" style={{ fontSize: 10, letterSpacing: 2, color: "var(--ed-muted)" }}>
+              {filtered.length} 筆
+            </span>
             {expenses.length > 0 && (
               <button
                 onClick={() => {
                   exportExpensesToCSV(filtered, currentTrip?.name || "旅程", tripMembers);
                   toast.success("CSV 已下載");
                 }}
-                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
+                className="ed-mono"
+                style={{
+                  fontSize: 10,
+                  letterSpacing: 2,
+                  color: "var(--ed-muted)",
+                  background: "transparent",
+                  border: 0,
+                  cursor: "pointer",
+                }}
               >
-                <Download className="h-3.5 w-3.5" />
-                匯出
+                匯出 ↓
               </button>
             )}
           </div>
         </div>
 
-        <div className="px-4 mb-3">
-          <ExpenseFilter
-            onChange={setFilter}
-            total={expenses.length}
-            filtered={filtered.length}
-          />
+        {/* PageTitle */}
+        <div style={{ padding: "14px 24px 0" }}>
+          <div className="ed-page-title-kicker">全 部 記 錄</div>
+          <div className="ed-page-title-h">
+            記帳本<span className="ed-page-title-dot">。</span>
+          </div>
         </div>
 
-        <div className="px-4 mb-4">
-          <Tabs
-            value={groupBy}
-            onValueChange={(v) => setGroupBy(v as "date" | "category" | "member" | "settlement")}
-          >
-            <TabsList className="w-full">
-              <TabsTrigger value="date" className="flex-1">
-                按日期
-              </TabsTrigger>
-              <TabsTrigger value="category" className="flex-1">
-                按類別
-              </TabsTrigger>
-              {!isGuest && (
-                <TabsTrigger value="member" className="flex-1">
-                  按成員
-                </TabsTrigger>
-              )}
-              {!isGuest && (
-                <TabsTrigger value="settlement" className="flex-1">
-                  結算
-                </TabsTrigger>
-              )}
-            </TabsList>
-          </Tabs>
-        </div>
+        {/* Day tabs */}
+        {totalDays > 0 ? (
+          <div className="ed-day-tabs" style={{ marginTop: 20 }}>
+            <button
+              className={"ed-day-tab" + (activeDay === "all" ? " on" : "")}
+              onClick={() => setActiveDay("all")}
+            >
+              全部
+            </button>
+            {Array.from({ length: totalDays }).map((_, i) => (
+              <button
+                key={i}
+                className={"ed-day-tab" + (activeDay === i + 1 ? " on" : "")}
+                onClick={() => setActiveDay(i + 1)}
+              >
+                Day {i + 1}
+              </button>
+            ))}
+          </div>
+        ) : null}
 
-        {groupBy === "settlement" ? (
-          <SettlementView expenses={filtered} tripMembers={tripMembers} />
-        ) : groupBy === "member" ? (
-          <MemberSummary expenses={filtered} tripMembers={tripMembers} onDelete={handleDelete} />
-        ) : (
-          <ExpenseList expenses={filtered} groupBy={groupBy} onDelete={handleDelete} />
-        )}
+        {/* Rows */}
+        <div style={{ padding: "18px 24px 0" }}>
+          {filtered.length === 0 ? (
+            <div style={{ padding: "60px 24px 0", textAlign: "center" }}>
+              <div
+                className="ed-serif"
+                style={{ fontSize: 80, opacity: 0.15, color: "var(--ed-ink)" }}
+              >
+                空
+              </div>
+              <div
+                className="ed-serif"
+                style={{ fontSize: 16, marginTop: 14, color: "var(--ed-ink)" }}
+              >
+                {activeDay === "all" ? "還沒有任何記錄" : "這天還沒有記錄"}
+              </div>
+              <div
+                className="ed-serif"
+                style={{
+                  fontSize: 12,
+                  color: "var(--ed-muted)",
+                  marginTop: 6,
+                  lineHeight: 1.6,
+                  fontStyle: "italic",
+                }}
+              >
+                點右下角 ＋ 新增一筆消費，
+                <br />
+                或掃描收據讓 AI 幫你填。
+              </div>
+            </div>
+          ) : (
+            filtered.map((e, i) => (
+              <EditorialRow
+                key={e.id}
+                expense={e}
+                index={i}
+                categories={categories}
+                onDelete={handleDelete}
+              />
+            ))
+          )}
+        </div>
       </div>
 
-      {/* FAB — 固定在中間滑動區塊的右下 */}
-      <Link
-        href="/records/new"
-        aria-label="新增消費"
-        className="absolute right-4 bottom-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-all active:scale-95"
-      >
-        <Plus className="h-6 w-6" />
+      {/* FAB */}
+      <Link href="/records/new" aria-label="新增消費" className="ed-fab">
+        ＋
       </Link>
     </div>
   );

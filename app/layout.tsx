@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Geist, JetBrains_Mono, Noto_Serif_TC, Shippori_Mincho } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { AppProvider } from "@/lib/context";
 import { ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme-context";
@@ -11,6 +11,27 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-sans",
   subsets: ["latin"],
+});
+
+const shippori = Shippori_Mincho({
+  weight: ["400", "600", "700", "800"],
+  subsets: ["latin"],
+  variable: "--font-shippori",
+  display: "swap",
+});
+
+const notoSerifTC = Noto_Serif_TC({
+  weight: ["400", "500", "600", "700", "900"],
+  subsets: ["latin"],
+  variable: "--font-noto-serif-tc",
+  display: "swap",
+});
+
+const jetbrains = JetBrains_Mono({
+  weight: ["400", "500", "600", "700"],
+  subsets: ["latin"],
+  variable: "--font-jetbrains",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -46,7 +67,7 @@ export default function RootLayout({
   return (
     <html
       lang="zh-TW"
-      className={`${geistSans.variable} h-full`}
+      className={`${geistSans.variable} ${shippori.variable} ${notoSerifTC.variable} ${jetbrains.variable} h-full`}
       data-theme="light"
       suppressHydrationWarning
     >
