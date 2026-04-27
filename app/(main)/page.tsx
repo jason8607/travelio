@@ -128,13 +128,13 @@ export default function HomePage() {
       <div className="flex-1 min-h-0 overflow-y-auto pb-6">
       {/* Guest Banner */}
       {isGuest && (
-        <div className="mx-4 mt-3 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 flex items-center justify-between">
-          <p className="text-xs text-amber-800">
+        <div className="mx-4 mt-3 rounded-xl bg-amber-50 border border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30 px-4 py-3 flex items-center justify-between">
+          <p className="text-xs text-amber-800 dark:text-amber-300">
             試用模式 — 資料僅存在此裝置
           </p>
           <Link
             href="/auth/login"
-            className="text-xs font-semibold text-amber-700 hover:text-amber-900 whitespace-nowrap ml-3"
+            className="text-xs font-semibold text-amber-700 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-200 whitespace-nowrap ml-3"
           >
             登入保存 →
           </Link>

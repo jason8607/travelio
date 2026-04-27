@@ -195,7 +195,7 @@ export function ReceiptConfirm({
               <button
                 type="button"
                 onClick={() => setAllOwner(null, "split")}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium border-amber-300 text-amber-800 bg-amber-50"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium border-amber-300 text-amber-800 bg-amber-50 dark:border-amber-500/50 dark:text-amber-300 dark:bg-amber-500/10"
               >
                 <Users className="h-3 w-3" /> 全部均分
               </button>

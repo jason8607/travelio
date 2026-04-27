@@ -462,7 +462,7 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
               className={cn(
                 "flex items-center gap-1.5 px-3 py-2.5 rounded-xl border-2 transition-all duration-200 text-sm font-medium",
                 splitType === "split"
-                  ? "border-amber-400 bg-amber-50 text-amber-800"
+                  ? "border-amber-400 bg-amber-50 text-amber-800 dark:border-amber-500/50 dark:bg-amber-500/10 dark:text-amber-300"
                   : "border-border/60 bg-card text-muted-foreground hover:bg-muted"
               )}
             >
@@ -471,7 +471,7 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
             </button>
           </div>
           {splitType === "split" && amount && (
-            <p className="text-xs text-amber-800 bg-amber-50 rounded-lg px-3 py-2">
+            <p className="text-xs text-amber-800 bg-amber-50 dark:text-amber-300 dark:bg-amber-500/10 rounded-lg px-3 py-2">
               每人 {currency === "JPY" ? "¥" : "NT$"}{Math.round(Number(amount) / tripMembers.length).toLocaleString()}
             </p>
           )}

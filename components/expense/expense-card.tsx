@@ -73,12 +73,12 @@ export function ExpenseCard({ expense, onDelete, categories = DEFAULT_CATEGORIES
             {expense.payment_method}
           </span>
           {expense.split_type === "split" && (
-            <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0 rounded-full font-medium">
+            <span className="inline-flex items-center gap-0.5 text-[10px] text-amber-700 bg-amber-50 dark:text-amber-300 dark:bg-amber-500/10 px-1.5 py-0 rounded-full font-medium">
               <Users className="h-2.5 w-2.5" />均分
             </span>
           )}
           {ownerMember && (
-            <span className="inline-flex items-center gap-0.5 text-[10px] text-rose-600 bg-rose-50 px-1.5 py-0 rounded-full font-medium">
+            <span className="inline-flex items-center gap-0.5 text-[10px] text-rose-600 bg-rose-50 dark:text-rose-300 dark:bg-rose-500/10 px-1.5 py-0 rounded-full font-medium">
               <ArrowRight className="h-2.5 w-2.5" />
               {ownerMember.profile?.avatar_emoji || "🧑"} {ownerMember.profile?.display_name || "成員"}
             </span>

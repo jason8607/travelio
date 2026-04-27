@@ -26,7 +26,7 @@ export function LazyPieChart({ data }: LazyPieChartProps) {
           startAngle={90}
           endAngle={-270}
           strokeWidth={2}
-          stroke="#fff"
+          stroke="var(--card)"
         >
           {data.map((entry) => (
             <Cell key={entry.name} fill={entry.color} />

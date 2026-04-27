@@ -499,17 +499,17 @@ export default function SummaryPage() {
 
       {/* Settlement summary */}
       {!isGuest && tripMembers.length > 1 && stats.settlements.length > 0 && (
-        <div className="rounded-2xl border bg-amber-50 border-amber-100 p-4 shadow-sm">
-          <h3 className="font-bold text-sm mb-3 text-amber-800">結算摘要</h3>
+        <div className="rounded-2xl border bg-amber-50 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/30 p-4 shadow-sm">
+          <h3 className="font-bold text-sm mb-3 text-amber-800 dark:text-amber-300">結算摘要</h3>
           <div className="space-y-2">
             {stats.settlements.map((s, i) => (
               <div key={i} className="flex items-center gap-2 text-sm">
                 <UserAvatar avatarUrl={s.fromAvatarUrl} avatarEmoji={s.fromEmoji} size="xs" />
-                <span className="text-amber-700">{s.fromName}</span>
+                <span className="text-amber-700 dark:text-amber-300">{s.fromName}</span>
                 <ArrowRight className="h-3 w-3 text-amber-500" />
-                <span className="font-bold text-amber-800">{formatJPY(s.amount)}</span>
+                <span className="font-bold text-amber-800 dark:text-amber-300">{formatJPY(s.amount)}</span>
                 <ArrowRight className="h-3 w-3 text-amber-500" />
-                <span className="text-amber-700">{s.toName}</span>
+                <span className="text-amber-700 dark:text-amber-300">{s.toName}</span>
                 <UserAvatar avatarUrl={s.toAvatarUrl} avatarEmoji={s.toEmoji} size="xs" />
               </div>
             ))}

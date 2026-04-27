@@ -208,7 +208,7 @@ export default function ScanPage() {
 
       {isGuest && guestOcrRemaining <= 0 && !ocrResult ? (
         <div className="flex flex-col items-center justify-center min-h-[40vh] px-6 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-amber-50 flex items-center justify-center mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center mb-4">
             <CameraIcon className="h-8 w-8 text-amber-400" />
           </div>
           <h2 className="text-lg font-bold text-foreground mb-2">

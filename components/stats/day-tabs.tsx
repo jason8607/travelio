@@ -47,7 +47,7 @@ export function DayTabs({ dates, selected, onChange, tripStartDate }: DayTabsPro
         className={cn(
           "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
           selected === null
-            ? "bg-foreground text-white shadow-sm"
+            ? "bg-foreground text-background shadow-sm dark:bg-primary dark:text-primary-foreground"
             : "bg-muted text-muted-foreground hover:bg-muted"
         )}
       >
@@ -63,7 +63,7 @@ export function DayTabs({ dates, selected, onChange, tripStartDate }: DayTabsPro
             className={cn(
               "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
               isActive
-                ? "bg-foreground text-white shadow-sm"
+                ? "bg-foreground text-background shadow-sm dark:bg-primary dark:text-primary-foreground"
                 : "bg-muted text-muted-foreground hover:bg-muted"
             )}
           >

@@ -376,7 +376,7 @@ export function CashbackChart({ expenses }: CashbackChartProps) {
               )}
 
               {member.unassignedCount > 0 && (
-                <p className="text-[11px] text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
+                <p className="text-[11px] text-amber-600 bg-amber-50 dark:text-amber-300 dark:bg-amber-500/10 rounded-lg px-3 py-2">
                   有 {member.unassignedCount} 筆信用卡消費未指定卡片，不列入回饋計算
                 </p>
               )}

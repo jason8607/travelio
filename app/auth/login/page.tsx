@@ -132,9 +132,9 @@ export default function LoginPage() {
 
         {/* Duplicate email hint */}
         {duplicateEmail && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <div className="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300 p-3 text-sm text-amber-800">
             <p className="font-medium mb-1">此 Email 已被註冊</p>
-            <p className="text-xs text-amber-700 mb-2">
+            <p className="text-xs text-amber-700 dark:text-amber-300 mb-2">
               此信箱已透過 Google 登入註冊。你可以先用 Google 登入，再設定密碼來啟用信箱登入。
             </p>
             <button

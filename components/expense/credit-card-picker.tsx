@@ -96,7 +96,7 @@ export function CreditCardPicker({ value, onChange, planValue, onPlanChange }: C
               className={cn(
                 "px-2.5 py-1.5 rounded-lg border transition-all duration-200 text-xs",
                 planValue === plan.id
-                  ? "border-amber-400 bg-amber-50 text-amber-800 font-medium"
+                  ? "border-amber-400 bg-amber-50 text-amber-800 dark:border-amber-500/50 dark:bg-amber-500/10 dark:text-amber-300 font-medium"
                   : "border-border/60 bg-card text-muted-foreground hover:bg-muted"
               )}
             >
