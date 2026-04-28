@@ -107,6 +107,139 @@
 .ed-bars i.accent { background: var(--ed-vermillion); }
 .ed-bars i.off { background: var(--ed-line); }
 
+/* Records view tabs (按日期 / 按類別 / 按成員 / 結算) */
+.ed-view-tabs {
+  display: flex;
+  gap: 0;
+  margin-top: 14px;
+  border-bottom: 1.5px solid var(--ed-ink);
+}
+.ed-view-tab {
+  flex: 1;
+  text-align: center;
+  padding: 10px 0;
+  font-family: var(--font-shippori), serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ed-ink-soft);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1.5px;
+  letter-spacing: 1px;
+  background: transparent;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+  cursor: pointer;
+}
+.ed-view-tab.on {
+  font-weight: 700;
+  color: var(--ed-vermillion);
+  border-bottom-color: var(--ed-vermillion);
+}
+
+/* Search bar (records header) */
+.ed-search-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 1.5px solid var(--ed-ink);
+  background: var(--ed-paper);
+}
+.ed-search-bar input {
+  flex: 1;
+  font-family: var(--font-shippori), serif;
+  font-size: 13px;
+  background: transparent;
+  border: 0;
+  outline: 0;
+  color: var(--ed-ink);
+  padding: 0;
+}
+.ed-search-bar input::placeholder { color: var(--ed-muted); }
+
+/* Filter toggle button (≡) */
+.ed-filter-toggle {
+  width: 38px;
+  height: 38px;
+  border: 1.5px solid var(--ed-ink);
+  background: transparent;
+  color: var(--ed-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 14px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.ed-filter-toggle.on {
+  border-color: var(--ed-vermillion);
+  background: var(--ed-vermillion);
+  color: var(--ed-paper);
+}
+
+/* Filter expanded panel */
+.ed-filter-panel {
+  margin-top: 14px;
+  padding: 14px;
+  background: var(--ed-cream);
+  border: 1px solid var(--ed-line);
+}
+
+/* Group header (按日期 / 按類別) */
+.ed-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--ed-ink);
+  margin-bottom: 4px;
+}
+.ed-group-label {
+  font-family: var(--font-shippori), serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 4px;
+}
+.ed-group-label.cat { color: var(--ed-vermillion); }
+.ed-group-meta {
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 9px;
+  letter-spacing: 1px;
+  color: var(--ed-muted);
+}
+
+/* New compact RecRow meta (mono 三欄: 分類 · 付款 · 分帳) */
+.ed-row-meta {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  margin-top: 5px;
+  font-family: var(--font-jetbrains), monospace;
+  font-size: 9.5px;
+  color: var(--ed-ink-soft);
+  letter-spacing: 1px;
+}
+.ed-row-meta .accent { color: var(--ed-vermillion); }
+.ed-row-meta .sep { color: var(--ed-line); }
+
+/* Member card (按成員) */
+.ed-member-card {
+  padding: 12px 14px;
+  border: 1.5px solid var(--ed-ink);
+}
+.ed-member-card.expanded {
+  border-bottom: none;
+}
+.ed-member-card-body {
+  padding: 6px 14px 14px;
+  border: 1.5px solid var(--ed-ink);
+  border-top: none;
+  margin-bottom: 14px;
+}
+
 /* Day tabs */
 .ed-day-tabs { display: flex; gap: 4px; padding: 0 24px; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; }
 .ed-day-tabs::-webkit-scrollbar { display: none; }

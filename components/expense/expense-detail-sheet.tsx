@@ -125,7 +125,7 @@ function ExpenseDetailContent({
         }}
       >
         <DetailField label="付款方式" value={expense.payment_method} />
-        <DetailField label="店家" value={expense.store_name || "—"} />
+        <DetailField label="類別" value={cat} />
         <DetailField label="日期" value={datetime} />
         <DetailField label="分帳" value={splitText} />
       </div>
