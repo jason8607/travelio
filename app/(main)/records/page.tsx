@@ -1,19 +1,19 @@
 "use client";
 
 import { ExpenseDetailSheet } from "@/components/expense/expense-detail-sheet";
+import { UserAvatar } from "@/components/ui/user-avatar";
 import { useCategories } from "@/hooks/use-categories";
 import { useExpenses } from "@/hooks/use-expenses";
 import { useApp } from "@/lib/context";
-import { exportExpensesToCSV } from "@/lib/export";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
-import { UserAvatar } from "@/components/ui/user-avatar";
+import { exportExpensesToCSV } from "@/lib/export";
 import { deleteGuestExpense } from "@/lib/guest-storage";
 import { calculateSettlements, type MemberBalance, type Settlement } from "@/lib/settlement";
+import type { CategoryItem, Expense, TripMember } from "@/types";
 import { differenceInDays, format, parseISO } from "date-fns";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
-import type { CategoryItem, Expense, TripMember } from "@/types";
 
 type ViewTab = "byDate" | "byCat" | "byMember" | "settle";
 const PAYMENT_OPTS = ["現金", "信用卡", "PayPay", "Suica"] as const;
@@ -51,17 +51,33 @@ const DEFAULT_AVATAR_CLASS =
 function RecRow({
   expense,
   members,
+  categories,
   currentUserId,
   onOpen,
 }: {
   expense: Expense;
   members: TripMember[];
+  categories: CategoryItem[];
   currentUserId: string | null;
   onOpen: (e: Expense) => void;
 }) {
   const showAvatar = members.length > 1;
   const paidByMember = members.find((m) => m.user_id === expense.paid_by);
+  const ownerMember = expense.owner_id
+    ? members.find((m) => m.user_id === expense.owner_id)
+    : null;
+  const category = categories.find(
+    (c) => c.value === expense.category || c.label === expense.category,
+  );
   const isCurrent = expense.paid_by === currentUserId;
+  const isSplit = expense.split_type === "split";
+  const ownerId = expense.owner_id ?? expense.paid_by;
+  const isCrossPaidPersonal = !isSplit && ownerId !== expense.paid_by;
+  const detailItems = [
+    expense.store_name ? expense.store_name : null,
+    expense.note,
+    expense.receipt_image_url ? "收據" : null,
+  ].filter(Boolean);
 
   return (
     <button
@@ -90,6 +106,31 @@ function RecRow({
       ) : null}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="ed-row-tt truncate">{expense.title}</div>
+        <div className="ed-row-meta" style={{ flexWrap: "wrap", rowGap: 3 }}>
+          <span>
+            {category?.icon ? `${category.icon} ` : ""}
+            {category ? category.label : categoryLabel(expense.category, categories)}
+          </span>
+          <span className="sep">·</span>
+          <span>{expense.payment_method}</span>
+          <span className="sep">·</span>
+          <span className={isSplit || isCrossPaidPersonal ? "accent" : undefined}>
+            {isSplit
+              ? "均分"
+              : isCrossPaidPersonal && paidByMember && ownerMember
+                ? `${memberName(paidByMember)} 幫 ${memberName(ownerMember)} 付`
+                : "個人"}
+          </span>
+          {showAvatar && !isCrossPaidPersonal && paidByMember ? (
+            <>
+              <span className="sep">·</span>
+              <span>{memberName(paidByMember)} 付</span>
+            </>
+          ) : null}
+        </div>
+        {detailItems.length > 0 ? (
+          <div className="ed-row-sub truncate">{detailItems.join(" · ")}</div>
+        ) : null}
       </div>
       <div style={{ textAlign: "right", flexShrink: 0 }}>
         <div className="ed-row-amt" style={{ fontSize: 18 }}>
@@ -224,6 +265,7 @@ function ByMember({
   members,
   filtered,
   memberCount,
+  categories,
   currentUserId,
   expandedMember,
   setExpandedMember,
@@ -232,6 +274,7 @@ function ByMember({
   members: TripMember[];
   filtered: Expense[];
   memberCount: number;
+  categories: CategoryItem[];
   currentUserId: string | null;
   expandedMember: string | null;
   setExpandedMember: (id: string | null) => void;
@@ -374,6 +417,7 @@ function ByMember({
                     key={e.id}
                     expense={e}
                     members={members}
+                    categories={categories}
                     currentUserId={currentUserId}
                     onOpen={onOpen}
                   />
@@ -987,6 +1031,7 @@ export default function RecordsPage() {
                     key={e.id}
                     expense={e}
                     members={tripMembers ?? []}
+                    categories={categories}
                     currentUserId={user?.id ?? null}
                     onOpen={setSelectedExpense}
                   />
@@ -1007,6 +1052,7 @@ export default function RecordsPage() {
                     key={e.id}
                     expense={e}
                     members={tripMembers ?? []}
+                    categories={categories}
                     currentUserId={user?.id ?? null}
                     onOpen={setSelectedExpense}
                   />
@@ -1018,6 +1064,7 @@ export default function RecordsPage() {
               members={tripMembers ?? []}
               filtered={filtered}
               memberCount={memberCount}
+              categories={categories}
               currentUserId={user?.id ?? null}
               expandedMember={expandedMember}
               setExpandedMember={setExpandedMember}
