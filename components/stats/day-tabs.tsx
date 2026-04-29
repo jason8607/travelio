@@ -37,21 +37,13 @@ export function DayTabs({ dates, selected, onChange, tripStartDate }: DayTabsPro
   }, [selected]);
 
   return (
-    <div
-      ref={scrollRef}
-      className="flex gap-2 overflow-x-auto scrollbar-hide pb-1 -mx-4 px-4"
-    >
+    <div ref={scrollRef} className="ed-day-tabs">
       <button
         ref={selected === null ? activeRef : undefined}
         onClick={() => onChange(null)}
-        className={cn(
-          "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
-          selected === null
-            ? "bg-foreground text-white shadow-sm"
-            : "bg-muted text-muted-foreground hover:bg-muted"
-        )}
+        className={cn("ed-day-tab", selected === null && "on")}
       >
-        全部
+        ALL
       </button>
       {tabs.map((tab) => {
         const isActive = selected === tab.key;
@@ -60,12 +52,7 @@ export function DayTabs({ dates, selected, onChange, tripStartDate }: DayTabsPro
             key={tab.key}
             ref={isActive ? activeRef : undefined}
             onClick={() => onChange(tab.key)}
-            className={cn(
-              "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
-              isActive
-                ? "bg-foreground text-white shadow-sm"
-                : "bg-muted text-muted-foreground hover:bg-muted"
-            )}
+            className={cn("ed-day-tab", isActive && "on")}
           >
             {tab.label}
           </button>

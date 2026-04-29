@@ -1,47 +1,42 @@
 "use client";
 
-import { formatJPY, formatTWD } from "@/lib/exchange-rate";
+import { formatJPY } from "@/lib/exchange-rate";
 import type { Expense } from "@/types";
 
 interface TopExpensesProps {
   expenses: Expense[];
   title?: string;
+  limit?: number;
 }
 
-export function TopExpenses({ expenses, title = "花費排名" }: TopExpensesProps) {
+export function TopExpenses({ expenses, title = "花 費 排 名", limit = 5 }: TopExpensesProps) {
   const sorted = [...expenses]
     .sort((a, b) => b.amount_jpy - a.amount_jpy)
-    .slice(0, 10);
+    .slice(0, limit);
 
   if (sorted.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border bg-card p-4 shadow-sm">
-      <h3 className="font-bold mb-3">{title}</h3>
-      <div className="space-y-2">
+    <section>
+      <div className="ed-section-head">
+        <span className="lbl">{title}</span>
+        <span className="meta">TOP {sorted.length}</span>
+      </div>
+      <div>
         {sorted.map((expense, index) => (
-          <div
-            key={expense.id}
-            className="flex items-center gap-3 text-sm"
-          >
-            <span className="w-5 text-center text-xs font-bold text-muted-foreground">
-              {index + 1}
-            </span>
-            <div className="flex-1 min-w-0">
-              <p className="truncate font-medium">{expense.title}</p>
-              <p className="text-[10px] text-muted-foreground">
-                {expense.expense_date} · {expense.store_name || expense.category}
-              </p>
+          <div key={expense.id} className="ed-top-row">
+            <span className="num">{String(index + 1).padStart(2, "0")}</span>
+            <div className="info">
+              <div className="ttl">{expense.title}</div>
+              <div className="meta">
+                {expense.expense_date}
+                {expense.category ? ` · ${expense.category}` : ""}
+              </div>
             </div>
-            <div className="text-right shrink-0">
-              <p className="font-bold">{formatJPY(expense.amount_jpy)}</p>
-              <p className="text-[10px] text-muted-foreground">
-                {formatTWD(expense.amount_twd)}
-              </p>
-            </div>
+            <div className="amt">{formatJPY(expense.amount_jpy)}</div>
           </div>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

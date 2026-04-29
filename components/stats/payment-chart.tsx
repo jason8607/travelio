@@ -1,22 +1,18 @@
 "use client";
 
-import { formatCompactJPY } from "@/lib/exchange-rate";
+import { formatJPY } from "@/lib/exchange-rate";
 import type { Expense } from "@/types";
 import { PAYMENT_METHODS } from "@/types";
 import { PaymentIcon } from "@/components/expense/payment-icon";
-import dynamic from "next/dynamic";
-
-const LazyPieChart = dynamic(
-  () => import("./lazy-pie-chart").then((m) => ({ default: m.LazyPieChart })),
-  { ssr: false, loading: () => <div className="w-28 h-28 rounded-full bg-muted animate-pulse" /> }
-);
 
 interface PaymentChartProps {
   expenses: Expense[];
   title?: string;
 }
 
-export function PaymentChart({ expenses, title = "支付方式" }: PaymentChartProps) {
+const BAR_TOTAL = 12;
+
+export function PaymentChart({ expenses, title = "支 付 方 式" }: PaymentChartProps) {
   const total = expenses.reduce((s, e) => s + e.amount_jpy, 0);
   if (total === 0) return null;
 
@@ -27,43 +23,43 @@ export function PaymentChart({ expenses, title = "支付方式" }: PaymentChartP
     return {
       name: pm.label,
       method: pm.value,
-      icon: pm.icon,
       value: amount,
-      color: pm.color,
       percentage: Math.round((amount / total) * 100),
     };
   })
     .filter((d) => d.value > 0)
     .sort((a, b) => b.value - a.value);
 
+  if (data.length === 0) return null;
+
   return (
-    <div className="rounded-2xl border bg-card p-4 shadow-sm">
-      <h3 className="font-bold mb-3">{title}</h3>
-      <div className="flex items-center gap-4">
-        <div className="shrink-0 w-28 h-28">
-          <LazyPieChart data={data} />
-        </div>
-        <div className="flex-1 space-y-1.5">
-          {data.map((item) => (
-            <div key={item.name} className="flex items-center gap-2 text-sm">
-              <div
-                className="shrink-0 w-2.5 h-2.5 rounded-full"
-                style={{ backgroundColor: item.color }}
-              />
-              <span className="flex-1 inline-flex items-center gap-1.5">
-                <PaymentIcon method={item.method} size={14} />
-                {item.name}
-              </span>
-              <span className="text-muted-foreground text-xs">
-                {item.percentage}%
-              </span>
-              <span className="font-medium text-xs">
-                {formatCompactJPY(item.value)}
-              </span>
-            </div>
-          ))}
-        </div>
+    <section>
+      <div className="ed-section-head">
+        <span className="lbl">{title}</span>
+        <span className="meta">PAYMENT · {data.length} 種</span>
       </div>
-    </div>
+      <div>
+        {data.map((item) => {
+          const filled = Math.max(1, Math.round((item.percentage / 100) * BAR_TOTAL));
+          const empty = BAR_TOTAL - filled;
+          return (
+            <div key={item.name} className="ed-cat-bar-row">
+              <div className="ed-cat-bar-line">
+                <span className="lb inline-flex items-center gap-1.5">
+                  <PaymentIcon method={item.method} size={14} />
+                  {item.name}
+                </span>
+                <span className="am">{formatJPY(item.value)}</span>
+              </div>
+              <div className="ed-cat-bar-blocks">
+                <span className="filled">{"█".repeat(filled)}</span>
+                <span className="empty">{"░".repeat(empty)}</span>
+                <span className="pct">{item.percentage}%</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
   );
 }

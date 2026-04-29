@@ -19,8 +19,15 @@
       ✅ Masthead（kicker + 大標 + 朱紅句點）三段狀態切換（intake / 辨識中 / 確認）
       ✅ ReceiptConfirm 換成 ed-item / ed-chip / ed-chip-sm pattern
       ⚠️ `?fromScan=` 預填 records/new 仍未做（屬決策事項 #2，待決定後再處理）
-- [ ] **`/stats` 統計頁**
-      donut chart + week bars 已有編輯風範例（`lib/screens-stats.jsx`）
+- [x] **`/stats` 統計頁**
+      ✅ 編輯風刊頭 + PageTitle + DayTabs（mono底線 active 朱紅）
+      ✅ 黑底總額卡（kicker / serif mega / mono sub）
+      ✅ CSS conic-gradient donut + 圖例（top 6 類別）
+      ✅ Week bars（每日支出，可點擊鎖定 day filter）
+      ✅ Category / Payment：block-character bar (`█████░░░░░` mono pattern)
+      ✅ Top expenses：朱紅編號 + serif 標題 + mono meta 三層
+      ✅ Cashback：dashed 分隔，朱紅進度條，max 狀態切深色
+      ✅ 通往 `/summary` 的 ed-btn-primary 按鈕
 - [ ] **`/settings` 設定頁**
       `.setRow` + `.setGroup` 已在 Travelio CSS 有定義，需 port 到 `editorial.css`
 - [ ] **`/summary` 報表頁**

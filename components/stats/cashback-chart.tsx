@@ -4,14 +4,11 @@ import { useMemo } from "react";
 import { useCreditCards } from "@/hooks/use-credit-cards";
 import type { Expense } from "@/types";
 import { cn } from "@/lib/utils";
-import { CreditCard as CreditCardIcon, Settings } from "lucide-react";
 import Link from "next/link";
 
 interface CashbackChartProps {
   expenses: Expense[];
 }
-
-const maxedColor = "text-amber-500";
 
 export function CashbackChart({ expenses }: CashbackChartProps) {
   const { cards, loading } = useCreditCards();
@@ -30,7 +27,6 @@ export function CashbackChart({ expenses }: CashbackChartProps) {
 
       const hasPlans = card.plans && card.plans.length > 0;
 
-      // Calculate per-plan breakdown if plans exist
       let planBreakdown: {
         planId: string;
         planName: string;
@@ -58,7 +54,6 @@ export function CashbackChart({ expenses }: CashbackChartProps) {
           };
         });
 
-        // Also account for card expenses without a plan assigned
         const unplannedExpenses = cardExpenses.filter(
           (e) => !e.credit_card_plan_id
         );
@@ -106,89 +101,74 @@ export function CashbackChart({ expenses }: CashbackChartProps) {
   );
 
   return (
-    <div className="rounded-2xl border bg-card p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
-        <h3 className="font-bold text-sm flex items-center gap-2">
-          <CreditCardIcon className="h-4 w-4 text-primary" />
-          信用卡回饋進度
-        </h3>
+    <section>
+      <div className="ed-section-head">
+        <span className="lbl">信 用 卡 回 饋</span>
         <Link
           href="/settings"
-          className="text-[11px] text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors"
+          className="meta"
+          style={{ textDecoration: "none" }}
         >
-          <Settings className="h-3 w-3" />
-          管理
+          MANAGE →
         </Link>
       </div>
 
-      <div className="space-y-4">
+      <div>
         {cardStats.map(({ card, totalTwd, cashbackEarned, progress, isMaxed, txCount, hasPlans, planBreakdown }) => (
-          <div key={card.id} className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="text-base">💳</span>
-                <span className="text-sm font-medium">{card.name}</span>
+          <div key={card.id} className="ed-cash-card">
+            <div className="ed-cash-head">
+              <span className="ed-cash-name">
+                💳 {card.name}
                 {!hasPlans && (
-                  <span className="text-[10px] text-muted-foreground">
+                  <span
+                    className="ed-mono"
+                    style={{ fontSize: 9, color: "var(--ed-muted)", letterSpacing: 1 }}
+                  >
                     {card.cashback_rate}%
                   </span>
                 )}
-              </div>
-              <div className="text-right">
+              </span>
+              <span className={cn("ed-cash-amt", isMaxed && "maxed")}>
+                NT${cashbackEarned.toLocaleString()}
                 <span
-                  className={cn(
-                    "text-sm font-bold",
-                    isMaxed ? maxedColor : "text-primary"
-                  )}
+                  className="ed-mono"
+                  style={{ fontSize: 9, color: "var(--ed-muted)", letterSpacing: 1, marginLeft: 4 }}
                 >
-                  NT${cashbackEarned.toLocaleString()}
+                  / {card.cashback_limit.toLocaleString()}
                 </span>
-                <span className="text-[11px] text-muted-foreground">
-                  {" "}/ NT${card.cashback_limit.toLocaleString()}
-                </span>
-              </div>
+              </span>
             </div>
 
-            <div className="h-2.5 rounded-full bg-muted overflow-hidden">
-              <div
-                className={cn(
-                  "h-full w-full rounded-full transition-[transform] duration-500 origin-left",
-                  isMaxed
-                    ? "bg-linear-to-r from-amber-400 to-amber-500"
-                    : "bg-linear-to-r from-primary/70 to-primary"
-                )}
-                style={{ transform: `scaleX(${progress / 100})` }}
+            <div className="ed-cash-bar">
+              <i
+                className={cn(isMaxed && "maxed")}
+                style={{ width: `${progress}%` }}
               />
             </div>
 
-            <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+            <div className="ed-cash-meta">
               <span>消費 NT${totalTwd.toLocaleString()} · {txCount} 筆</span>
               {isMaxed ? (
-                <span className={cn(maxedColor, "font-medium")}>已達上限</span>
+                <span style={{ color: "var(--ed-ink)", fontWeight: 700 }}>已達上限</span>
               ) : (
-                <span>
-                  還差 NT${(card.cashback_limit - cashbackEarned).toLocaleString()}
-                </span>
+                <span>還差 NT${(card.cashback_limit - cashbackEarned).toLocaleString()}</span>
               )}
             </div>
 
-            {/* Plan breakdown */}
             {hasPlans && planBreakdown.length > 0 && (
-              <div className="pl-3 space-y-1 ml-1">
+              <div className="ed-cash-plans">
                 {planBreakdown
                   .filter((p) => p.totalTwd > 0)
                   .map((p) => (
-                    <div key={p.planId} className="flex items-center justify-between text-[11px]">
-                      <span className="text-muted-foreground">
+                    <div key={p.planId} className="ed-cash-plan-row">
+                      <span>
                         {p.planName}
-                        {p.rate > 0 && <span className="text-muted-foreground ml-1">{p.rate}%</span>}
+                        {p.rate > 0 && <span style={{ marginLeft: 4 }}>· {p.rate}%</span>}
                       </span>
-                      <span className="text-muted-foreground">
+                      <span>
                         NT${p.totalTwd.toLocaleString()}
                         {p.cashback > 0 && (
-                          <span className="text-primary ml-1">
-                            +NT${p.cashback.toLocaleString()}
-                          </span>
+                          <span className="gain">+{p.cashback.toLocaleString()}</span>
                         )}
                       </span>
                     </div>
@@ -200,12 +180,20 @@ export function CashbackChart({ expenses }: CashbackChartProps) {
       </div>
 
       {unassigned.length > 0 && (
-        <div className="mt-4 pt-3 border-t border-border/60">
-          <p className="text-[11px] text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
-            有 {unassigned.length} 筆信用卡消費未指定卡片，不列入回饋計算
-          </p>
+        <div
+          className="ed-mono"
+          style={{
+            marginTop: 12,
+            padding: "8px 12px",
+            border: "1px dashed var(--ed-vermillion)",
+            color: "var(--ed-vermillion)",
+            fontSize: 10,
+            letterSpacing: 1,
+          }}
+        >
+          有 {unassigned.length} 筆信用卡消費未指定卡片，不列入回饋計算
         </div>
       )}
-    </div>
+    </section>
   );
 }
