@@ -26,6 +26,7 @@ import {
   UserPlus,
   Copy,
   Pencil,
+  Settings as SettingsIcon,
   X,
   Trash2,
 } from "lucide-react";
@@ -36,6 +37,7 @@ import { updateGuestTrip } from "@/lib/guest-storage";
 import { CreditCardManager } from "@/components/settings/credit-card-manager";
 import { CategoryManager } from "@/components/settings/category-manager";
 import { ThemeSwitcher } from "@/components/settings/theme-switcher";
+import { AuthRequiredState } from "@/components/layout/auth-required-state";
 import type { Trip, TripMember, Profile } from "@/types";
 
 export default function SettingsPage() {
@@ -324,14 +326,10 @@ export default function SettingsPage() {
 
   if (!user && !isGuest) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh]">
-        <Link
-          href="/auth/login"
-          className="bg-primary text-white px-6 py-2 rounded-xl"
-        >
-          請先登入
-        </Link>
-      </div>
+      <AuthRequiredState
+        icon={SettingsIcon}
+        description="登入後可以管理旅程、成員、信用卡方案與個人設定。"
+      />
     );
   }
 
@@ -450,7 +448,7 @@ export default function SettingsPage() {
         <Button
           variant="ghost"
           onClick={() => { exitGuestMode(); router.push("/"); }}
-          className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+          className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
         >
           <LogOut className="h-4 w-4 mr-2" />
           結束試用
@@ -586,7 +584,7 @@ export default function SettingsPage() {
                   type="button"
                   variant="outline"
                   onClick={() => setDeleteTripTarget(currentTrip)}
-                  className="w-full h-10 rounded-lg text-sm text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200"
+                  className="w-full h-10 rounded-lg text-sm text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30"
                   disabled={saving}
                 >
                   <Trash2 className="h-4 w-4 mr-1.5" />
@@ -633,7 +631,7 @@ export default function SettingsPage() {
                   {isOwner && m.role !== "owner" && (
                     <button
                       onClick={() => setRemoveTarget({ userId: m.user_id, name: m.profile?.display_name || "成員" })}
-                      className="p-1 text-muted-foreground/60 hover:text-red-500 transition-colors"
+                      className="p-1 text-muted-foreground/60 hover:text-destructive transition-colors"
                       aria-label={`移除${m.profile?.display_name || "成員"}`}
                     >
                       <X className="h-3.5 w-3.5" />
@@ -729,7 +727,7 @@ export default function SettingsPage() {
       <Button
         variant="ghost"
         onClick={handleLogout}
-        className="w-full text-red-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
+        className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 rounded-xl"
       >
         <LogOut className="h-4 w-4 mr-2" />
         登出
@@ -748,7 +746,7 @@ export default function SettingsPage() {
               取消
             </Button>
             <Button
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
               onClick={handleRemoveMember}
             >
               確定移除
@@ -779,7 +777,7 @@ export default function SettingsPage() {
               取消
             </Button>
             <Button
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
               onClick={handleDeleteTrip}
               disabled={deletingTrip}
             >

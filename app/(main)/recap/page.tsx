@@ -1,7 +1,10 @@
 "use client";
 
 import { PageHeader } from "@/components/layout/page-header";
-import { WrappedCard } from "@/components/recap/wrapped-card";
+import {
+  WrappedCard,
+  type WrappedCardVariant,
+} from "@/components/recap/wrapped-card";
 import { useCategories } from "@/hooks/use-categories";
 import { useCreditCards } from "@/hooks/use-credit-cards";
 import { useExpenses } from "@/hooks/use-expenses";
@@ -42,9 +45,13 @@ async function loadIconDataUrl(): Promise<string> {
 interface CardConfig {
   key: string;
   title: string;
+  kicker?: string;
   big: string;
   sub: string;
   note?: string;
+  badge?: string;
+  decorText?: string;
+  variant: WrappedCardVariant;
 }
 
 export default function RecapPage() {
@@ -180,15 +187,31 @@ export default function RecapPage() {
   const wrapped = useMemo(() => {
     if (!stats || !currentTrip) return null;
     const tripStart = parseISO(currentTrip.start_date);
+    const tripEnd = parseISO(currentTrip.end_date);
     const year = format(tripStart, "yyyy");
+    const tripRange = `${format(tripStart, "yyyy.MM.dd")} — ${format(
+      tripEnd,
+      "MM.dd"
+    )}`;
 
     const configs: CardConfig[] = [
       {
+        key: "cover",
+        variant: "cover",
+        kicker: "TRAVEL RECAP",
+        title: "你的旅程",
+        big: currentTrip.name,
+        sub: `${tripRange} · ${stats.activeDays} 天有消費紀錄`,
+      },
+      {
         key: "total",
-        title: "總花費",
+        variant: "total",
+        kicker: "TOTAL SPENT",
+        title: "這趟你們花了",
         big: `¥${stats.totalJpy.toLocaleString()}`,
         sub: `≈ NT$${stats.totalTwd.toLocaleString()}`,
         note: `共 ${stats.count} 筆消費 · ${stats.activeDays} 天`,
+        badge: "★ 旅費總結 ★",
       },
     ];
 
@@ -198,17 +221,22 @@ export default function RecapPage() {
       );
       configs.push({
         key: "fav",
-        title: "最愛類別",
+        variant: "category",
+        kicker: "TOP CATEGORY",
+        title: "花最多的類別是",
         big: `${stats.topCategory.icon} ${stats.topCategory.label}`,
-        sub: `共 ${stats.topCategory.count} 筆 · 佔 ${pct}%`,
-        note: `花了 ¥${stats.topCategory.amount.toLocaleString()}`,
+        sub: `¥${stats.topCategory.amount.toLocaleString()} · 佔 ${pct}%`,
+        note: `這個類別共有 ${stats.topCategory.count} 筆，是這趟旅行最重的支出記憶。`,
+        decorText: stats.topCategory.label.slice(0, 1),
       });
     }
 
     if (stats.topStore) {
       configs.push({
         key: "store",
-        title: "最常造訪",
+        variant: "store",
+        kicker: "REVISITED PLACE",
+        title: "最常出現的店名",
         big: stats.topStore.name,
         sub: `去了 ${stats.topStore.count} 次`,
         note: "旅途中的日常風景",
@@ -217,7 +245,9 @@ export default function RecapPage() {
 
     configs.push({
       key: "big",
-      title: "最貴一筆",
+      variant: "big",
+      kicker: "BIGGEST EXPENSE",
+      title: "最揮霍的一筆",
       big: `¥${stats.topExpense.amount_jpy.toLocaleString()}`,
       sub: stats.topExpense.title,
       note: [
@@ -226,12 +256,15 @@ export default function RecapPage() {
       ]
         .filter(Boolean)
         .join(" · "),
+      badge: "但絕對值得",
     });
 
     if (stats.totalCashback > 0) {
       configs.push({
         key: "card",
-        title: "信用卡回饋",
+        variant: "cashback",
+        kicker: "SMART CARD",
+        title: "聰明刷卡賺到",
         big: `NT$${stats.totalCashback.toLocaleString()}`,
         sub: stats.topCashbackCardName
           ? `主要來自 ${stats.topCashbackCardName}`
@@ -243,12 +276,25 @@ export default function RecapPage() {
     if (stats.maxDay.date) {
       configs.push({
         key: "day",
-        title: "最豪氣一日",
+        variant: "day",
+        kicker: "BIGGEST DAY",
+        title: "花最瘋的一天",
         big: `¥${stats.maxDay.amount.toLocaleString()}`,
         sub: format(parseISO(stats.maxDay.date), "yyyy/M/d"),
         note: "最揮霍的一天",
       });
     }
+
+    configs.push({
+      key: "finale",
+      variant: "finale",
+      kicker: "FIN.",
+      title: "謝謝這趟旅行。",
+      big: `${stats.count} 筆`,
+      sub: `${stats.activeDays} 天 · ¥${stats.totalJpy.toLocaleString()} 的回憶`,
+      note: `${currentTrip.name} · ${tripRange}`,
+      badge: "分 享 給 旅 伴",
+    });
 
     return { year, cards: configs };
   }, [stats, currentTrip]);
@@ -438,9 +484,13 @@ export default function RecapPage() {
                     tripName={currentTrip.name}
                     year={wrapped.year}
                     title={c.title}
+                    kicker={c.kicker}
                     big={c.big}
                     sub={c.sub}
                     note={c.note}
+                    badge={c.badge}
+                    decorText={c.decorText}
+                    variant={c.variant}
                     index={i}
                     total={total}
                     iconSrc={iconDataUrl ?? ICON_SRC}

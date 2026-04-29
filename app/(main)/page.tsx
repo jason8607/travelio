@@ -128,13 +128,13 @@ export default function HomePage() {
       <div className="flex-1 min-h-0 overflow-y-auto pb-6">
       {/* Guest Banner */}
       {isGuest && (
-        <div className="mx-4 mt-3 rounded-xl bg-amber-50 border border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30 px-4 py-3 flex items-center justify-between">
-          <p className="text-xs text-amber-800 dark:text-amber-300">
+        <div className="mx-4 mt-3 rounded-xl bg-warning-subtle border border-warning/30 px-4 py-3 flex items-center justify-between">
+          <p className="text-xs text-warning-foreground">
             試用模式 — 資料僅存在此裝置
           </p>
           <Link
             href="/auth/login"
-            className="text-xs font-semibold text-amber-700 hover:text-amber-900 dark:text-amber-300 dark:hover:text-amber-200 whitespace-nowrap ml-3"
+            className="text-xs font-semibold text-warning-foreground hover:text-warning-foreground/80 whitespace-nowrap ml-3"
           >
             登入保存 →
           </Link>
@@ -163,7 +163,7 @@ export default function HomePage() {
       {/* 匯率 pill */}
       <div className="flex justify-start px-5 pb-4">
         <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border/60 px-4 py-1.5 shadow-sm">
-          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+          <span className="w-2 h-2 rounded-full bg-success" />
           <span className="text-xs text-muted-foreground">JPY 100</span>
           <span className="text-xs text-muted-foreground/60">≈</span>
           <span className="text-sm font-semibold text-foreground">
@@ -191,7 +191,7 @@ export default function HomePage() {
         <Link href="/stats" className="block">
           <div className="rounded-2xl bg-card border border-border/60 px-4 py-3.5 shadow-sm h-full">
             <p className="text-[11px] text-muted-foreground font-medium">回饋</p>
-            <p className="text-xl font-bold text-emerald-600 tracking-tight mt-1.5">
+            <p className="text-xl font-bold text-success tracking-tight mt-1.5">
               {cards.length > 0 ? formatTWD(cashbackTotal) : "—"}
             </p>
           </div>

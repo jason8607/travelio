@@ -107,7 +107,7 @@ export function SettlementView({
               </div>
               <div className="text-right shrink-0">
                 {b.balance < 0 ? (
-                  <span className="text-sm font-bold text-red-500">
+                  <span className="text-sm font-bold text-destructive">
                     -¥{Math.abs(b.balance).toLocaleString()}
                   </span>
                 ) : (

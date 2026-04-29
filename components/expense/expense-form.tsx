@@ -340,8 +340,8 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
               className={cn(
                 "text-xs px-2.5 py-1 rounded-full transition-colors",
                 currentTrip && isPreTripDate(expenseDate, currentTrip.start_date)
-                  ? "bg-amber-100 text-amber-700 font-medium"
-                  : "bg-muted text-muted-foreground hover:bg-muted"
+                  ? "bg-primary/10 text-primary font-medium"
+                  : "bg-card text-muted-foreground ring-1 ring-border hover:bg-accent hover:text-accent-foreground"
               )}
             >
               ✈️ 行前
@@ -462,8 +462,8 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
               className={cn(
                 "flex items-center gap-1.5 px-3 py-2.5 rounded-xl border-2 transition-all duration-200 text-sm font-medium",
                 splitType === "split"
-                  ? "border-amber-400 bg-amber-50 text-amber-800 dark:border-amber-500/50 dark:bg-amber-500/10 dark:text-amber-300"
-                  : "border-border/60 bg-card text-muted-foreground hover:bg-muted"
+                  ? "border-primary/50 bg-primary/10 text-primary"
+                  : "border-border/60 bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
               )}
             >
               <Users className="h-4 w-4" />
@@ -471,7 +471,7 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
             </button>
           </div>
           {splitType === "split" && amount && (
-            <p className="text-xs text-amber-800 bg-amber-50 dark:text-amber-300 dark:bg-amber-500/10 rounded-lg px-3 py-2">
+            <p className="rounded-lg bg-warning-subtle px-3 py-2 text-xs text-warning-foreground">
               每人 {currency === "JPY" ? "¥" : "NT$"}{Math.round(Number(amount) / tripMembers.length).toLocaleString()}
             </p>
           )}
@@ -531,7 +531,7 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
           <Button
             type="button"
             variant="outline"
-            className="w-full h-12 text-base text-red-500 hover:text-red-600 hover:bg-red-50 border-red-200 rounded-xl"
+            className="w-full h-12 text-base text-destructive hover:text-destructive hover:bg-destructive/10 border-destructive/30 rounded-xl"
             onClick={() => setShowDeleteDialog(true)}
             disabled={saving || deleting}
           >
@@ -552,7 +552,7 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
               取消
             </Button>
             <Button
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
               onClick={handleDelete}
               disabled={deleting}
             >

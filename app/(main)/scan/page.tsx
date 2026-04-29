@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/lib/context";
+import { AuthRequiredState } from "@/components/layout/auth-required-state";
 import { PageHeader } from "@/components/layout/page-header";
 import { ReceiptUpload } from "@/components/scan/receipt-upload";
 import { ReceiptConfirm } from "@/components/scan/receipt-confirm";
@@ -180,17 +181,10 @@ export default function ScanPage() {
 
   if (!isGuest && !user) {
     return (
-      <div className="pb-4">
-        <PageHeader title="掃描收據" />
-        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4">
-            <CameraIcon className="h-8 w-8 text-primary/70" />
-          </div>
-          <h2 className="text-lg font-bold text-foreground mb-2">
-            請先登入或以訪客模式使用
-          </h2>
-        </div>
-      </div>
+      <AuthRequiredState
+        icon={CameraIcon}
+        description="登入或使用訪客模式後，就能掃描收據並自動建立消費紀錄。"
+      />
     );
   }
 
@@ -208,8 +202,8 @@ export default function ScanPage() {
 
       {isGuest && guestOcrRemaining <= 0 && !ocrResult ? (
         <div className="flex flex-col items-center justify-center min-h-[40vh] px-6 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center mb-4">
-            <CameraIcon className="h-8 w-8 text-amber-400" />
+          <div className="w-16 h-16 rounded-2xl bg-warning-subtle flex items-center justify-center mb-4">
+            <CameraIcon className="h-8 w-8 text-warning" />
           </div>
           <h2 className="text-lg font-bold text-foreground mb-2">
             訪客掃描次數已用完

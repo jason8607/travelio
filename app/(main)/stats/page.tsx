@@ -8,13 +8,14 @@ import { PaymentChart } from "@/components/stats/payment-chart";
 import { TopExpenses } from "@/components/stats/top-expenses";
 import { CashbackChart } from "@/components/stats/cashback-chart";
 import { DayTabs, PRE_TRIP_KEY } from "@/components/stats/day-tabs";
+import { AuthRequiredState } from "@/components/layout/auth-required-state";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
 import { formatDateLabel, isPreTripDate } from "@/lib/utils";
 import Link from "next/link";
-import { ClipboardList } from "lucide-react";
+import { BarChart3, ClipboardList } from "lucide-react";
 
 export default function StatsPage() {
-  const { currentTrip, loading: ctxLoading } = useApp();
+  const { user, currentTrip, isGuest, loading: ctxLoading } = useApp();
   const { expenses, loading } = useExpenses();
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
@@ -43,6 +44,15 @@ export default function StatsPage() {
   }
 
   if (!currentTrip) {
+    if (!user && !isGuest) {
+      return (
+        <AuthRequiredState
+          icon={BarChart3}
+          description="登入或使用訪客模式後，就能查看分類支出、付款方式與信用卡回饋統計。"
+        />
+      );
+    }
+
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-muted-foreground">
         <p className="text-4xl mb-2">📊</p>

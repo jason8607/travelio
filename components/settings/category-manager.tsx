@@ -153,7 +153,7 @@ export function CategoryManager() {
               </button>
               <button
                 onClick={() => setDeleteTarget(item)}
-                className="p-1.5 text-muted-foreground hover:text-red-500 transition-colors"
+                className="p-1.5 text-muted-foreground hover:text-destructive transition-colors"
               >
                 <Trash2 className="h-3.5 w-3.5" />
               </button>
@@ -263,7 +263,7 @@ export function CategoryManager() {
               取消
             </Button>
             <Button
-              className="bg-red-500 hover:bg-red-600 text-white"
+              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
               onClick={handleDelete}
             >
               確定刪除

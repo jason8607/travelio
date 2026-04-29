@@ -5,18 +5,19 @@ import { EMPTY_FILTER, ExpenseFilter } from "@/components/expense/expense-filter
 import { ExpenseList } from "@/components/expense/expense-list";
 import { MemberSummary } from "@/components/expense/member-summary";
 import { SettlementView } from "@/components/expense/settlement-view";
+import { AuthRequiredState } from "@/components/layout/auth-required-state";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useExpenses } from "@/hooks/use-expenses";
 import { useApp } from "@/lib/context";
 import { exportExpensesToCSV } from "@/lib/export";
 import { deleteGuestExpense } from "@/lib/guest-storage";
-import { Download, Plus } from "lucide-react";
+import { ClipboardList, Download, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export default function RecordsPage() {
-  const { currentTrip, tripMembers, isGuest, loading: ctxLoading } = useApp();
+  const { user, currentTrip, tripMembers, isGuest, loading: ctxLoading } = useApp();
   const { expenses, loading, error, refresh } = useExpenses();
   const [groupBy, setGroupBy] = useState<"date" | "category" | "member" | "settlement">("date");
   const [filter, setFilter] = useState<ExpenseFilterState>(EMPTY_FILTER);
@@ -78,9 +79,18 @@ export default function RecordsPage() {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <p className="text-sm text-red-500">載入消費紀錄失敗</p>
+        <p className="text-sm text-destructive">載入消費紀錄失敗</p>
         <button onClick={refresh} className="text-sm text-primary underline">重新載入</button>
       </div>
+    );
+  }
+
+  if (!user && !isGuest) {
+    return (
+      <AuthRequiredState
+        icon={ClipboardList}
+        description="登入或使用訪客模式後，就能查看、篩選與管理旅程中的所有消費紀錄。"
+      />
     );
   }
 

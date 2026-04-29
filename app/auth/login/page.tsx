@@ -5,14 +5,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { createClient } from "@/lib/supabase/client";
-import { Mail } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
 export default function LoginPage() {
-  const [showEmail, setShowEmail] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -96,6 +94,101 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {/* Duplicate email hint */}
+        {duplicateEmail && (
+          <div className="rounded-xl border border-warning/30 bg-warning-subtle p-3 text-sm text-warning-foreground">
+            <p className="font-medium mb-1">此 Email 已被註冊</p>
+            <p className="text-xs text-warning-foreground/80 mb-2">
+              此信箱已透過 Google 登入註冊。你可以先用 Google 登入，再設定密碼來啟用信箱登入。
+            </p>
+            <button
+              onClick={async () => {
+                setLoading(true);
+                const { error } = await supabase.auth.signInWithOAuth({
+                  provider: "google",
+                  options: {
+                    redirectTo: `${window.location.origin}/auth/callback?next=/auth/set-password`,
+                  },
+                });
+                if (error) {
+                  toast.error(error.message);
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="w-full h-9 rounded-lg bg-warning text-warning-foreground hover:bg-warning/90 text-xs font-medium transition-colors disabled:opacity-60"
+            >
+              使用 Google 登入並設定密碼
+            </button>
+          </div>
+        )}
+
+        {/* Email Login */}
+        <div className="rounded-2xl border bg-card p-4 shadow-sm">
+          <form onSubmit={handleEmailSubmit} className="space-y-3">
+            {isSignUp && (
+              <div className="space-y-1.5">
+                <Label htmlFor="name" className="text-xs text-muted-foreground">暱稱</Label>
+                <Input
+                  id="name"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="你的暱稱"
+                  className="h-10 rounded-lg text-sm"
+                />
+              </div>
+            )}
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-xs text-muted-foreground">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@example.com"
+                required
+                className="h-10 rounded-lg text-sm"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-xs text-muted-foreground">密碼</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="至少 6 個字元"
+                required
+                minLength={6}
+                className="h-10 rounded-lg text-sm"
+              />
+            </div>
+            <Button
+              type="submit"
+              className="w-full h-10 bg-primary hover:bg-primary/90 rounded-lg text-sm"
+              disabled={loading}
+            >
+              {loading ? "處理中..." : isSignUp ? "註冊" : "登入"}
+            </Button>
+          </form>
+
+          <div className="mt-3 text-center text-xs">
+            <button
+              onClick={() => { setIsSignUp(!isSignUp); setDuplicateEmail(false); }}
+              className="text-primary hover:underline"
+            >
+              {isSignUp ? "已有帳號？登入" : "還沒有帳號？註冊"}
+            </button>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3">
+          <Separator className="flex-1" />
+          <span className="text-xs text-muted-foreground">或</span>
+          <Separator className="flex-1" />
+        </div>
+
         {/* Google Login */}
         <button
           onClick={handleGoogleLogin}
@@ -122,111 +215,6 @@ export default function LoginPage() {
           </svg>
           使用 Google 登入
         </button>
-
-        {/* Divider */}
-        <div className="flex items-center gap-3">
-          <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground">或</span>
-          <Separator className="flex-1" />
-        </div>
-
-        {/* Duplicate email hint */}
-        {duplicateEmail && (
-          <div className="rounded-xl border border-amber-200 bg-amber-50 dark:border-amber-500/30 dark:bg-amber-500/10 dark:text-amber-300 p-3 text-sm text-amber-800">
-            <p className="font-medium mb-1">此 Email 已被註冊</p>
-            <p className="text-xs text-amber-700 dark:text-amber-300 mb-2">
-              此信箱已透過 Google 登入註冊。你可以先用 Google 登入，再設定密碼來啟用信箱登入。
-            </p>
-            <button
-              onClick={async () => {
-                setLoading(true);
-                const { error } = await supabase.auth.signInWithOAuth({
-                  provider: "google",
-                  options: {
-                    redirectTo: `${window.location.origin}/auth/callback?next=/auth/set-password`,
-                  },
-                });
-                if (error) {
-                  toast.error(error.message);
-                  setLoading(false);
-                }
-              }}
-              disabled={loading}
-              className="w-full h-9 rounded-lg bg-amber-600 hover:bg-amber-700 text-white text-xs font-medium transition-colors disabled:opacity-60"
-            >
-              使用 Google 登入並設定密碼
-            </button>
-          </div>
-        )}
-
-        {/* Email Login */}
-        {!showEmail ? (
-          <button
-            onClick={() => setShowEmail(true)}
-            className="w-full h-11 rounded-xl border border-border bg-card hover:bg-muted flex items-center justify-center gap-2 text-sm text-muted-foreground transition-colors"
-          >
-            <Mail className="h-4 w-4" />
-            使用 Email 登入
-          </button>
-        ) : (
-          <div className="rounded-2xl border bg-card p-4 shadow-sm">
-            <form onSubmit={handleEmailSubmit} className="space-y-3">
-              {isSignUp && (
-                <div className="space-y-1.5">
-                  <Label htmlFor="name" className="text-xs text-muted-foreground">暱稱</Label>
-                  <Input
-                    id="name"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="你的暱稱"
-                    className="h-10 rounded-lg text-sm"
-                  />
-                </div>
-              )}
-              <div className="space-y-1.5">
-                <Label htmlFor="email" className="text-xs text-muted-foreground">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  required
-                  className="h-10 rounded-lg text-sm"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="password" className="text-xs text-muted-foreground">密碼</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="至少 6 個字元"
-                  required
-                  minLength={6}
-                  className="h-10 rounded-lg text-sm"
-                />
-              </div>
-              <Button
-                type="submit"
-                className="w-full h-10 bg-primary hover:bg-primary/90 rounded-lg text-sm"
-                disabled={loading}
-              >
-                {loading ? "處理中..." : isSignUp ? "註冊" : "登入"}
-              </Button>
-            </form>
-
-            <div className="mt-3 text-center text-xs">
-              <button
-                onClick={() => { setIsSignUp(!isSignUp); setDuplicateEmail(false); }}
-                className="text-primary hover:underline"
-              >
-                {isSignUp ? "已有帳號？登入" : "還沒有帳號？註冊"}
-              </button>
-            </div>
-          </div>
-        )}
 
         <p className="text-center text-[10px] text-muted-foreground">
           登入即表示同意使用條款與隱私權政策

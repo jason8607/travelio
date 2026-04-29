@@ -320,7 +320,7 @@ export default function SummaryPage() {
       </div>
 
       {/* Total spending hero card */}
-      <div className="rounded-2xl bg-linear-to-br from-primary to-primary/90 p-5 text-white shadow-lg">
+      <div className="rounded-2xl bg-linear-to-br from-primary to-primary/90 p-5 text-primary-foreground shadow-lg">
         <p className="text-sm opacity-80 mb-1">旅程總花費</p>
         <p className="text-3xl font-bold">{formatJPY(stats.totalJpy)}</p>
         <p className="text-sm opacity-80 mt-1">
@@ -334,7 +334,7 @@ export default function SummaryPage() {
             </div>
             <div className="h-2 rounded-full bg-card/20">
               <div
-                className={`h-2 rounded-full transition-all ${stats.budgetUsed > 100 ? "bg-red-300" : "bg-card/80"}`}
+                className={`h-2 rounded-full transition-all ${stats.budgetUsed > 100 ? "bg-destructive" : "bg-card/80"}`}
                 style={{ width: `${Math.min(stats.budgetUsed, 100)}%` }}
               />
             </div>
@@ -350,12 +350,12 @@ export default function SummaryPage() {
           <p className="text-[10px] text-muted-foreground">筆消費</p>
         </div>
         <div className="rounded-xl bg-card border border-border/60 p-3 shadow-sm text-center">
-          <CalendarDays className="h-4 w-4 text-orange-600 mx-auto mb-1" />
+          <CalendarDays className="h-4 w-4 text-primary mx-auto mb-1" />
           <p className="text-lg font-bold">{stats.activeDays}</p>
           <p className="text-[10px] text-muted-foreground">天有消費</p>
         </div>
         <div className="rounded-xl bg-card border border-border/60 p-3 shadow-sm text-center">
-          <TrendingUp className="h-4 w-4 text-emerald-500 mx-auto mb-1" />
+          <TrendingUp className="h-4 w-4 text-success mx-auto mb-1" />
           <p className="text-lg font-bold">{formatJPY(stats.dailyAvgJpy)}</p>
           <p className="text-[10px] text-muted-foreground">日均花費</p>
         </div>
@@ -364,7 +364,7 @@ export default function SummaryPage() {
       {/* Top expense */}
       <div className="rounded-2xl border bg-card p-4 shadow-sm">
         <div className="flex items-center gap-2 mb-2">
-          <Crown className="h-4 w-4 text-amber-500" />
+          <Crown className="h-4 w-4 text-warning" />
           <h3 className="font-bold text-sm">最大筆消費</h3>
         </div>
         <div className="flex items-center gap-3">
@@ -383,7 +383,7 @@ export default function SummaryPage() {
       {stats.maxDaySpend.date && (
         <div className="rounded-2xl border bg-card p-4 shadow-sm">
           <div className="flex items-center gap-2 mb-2">
-            <CalendarDays className="h-4 w-4 text-red-500" />
+            <CalendarDays className="h-4 w-4 text-destructive" />
             <h3 className="font-bold text-sm">花最多的一天</h3>
           </div>
           <div className="flex items-center justify-between">
@@ -499,17 +499,17 @@ export default function SummaryPage() {
 
       {/* Settlement summary */}
       {!isGuest && tripMembers.length > 1 && stats.settlements.length > 0 && (
-        <div className="rounded-2xl border bg-amber-50 border-amber-100 dark:bg-amber-500/10 dark:border-amber-500/30 p-4 shadow-sm">
-          <h3 className="font-bold text-sm mb-3 text-amber-800 dark:text-amber-300">結算摘要</h3>
+        <div className="rounded-2xl border bg-warning-subtle border-warning/30 p-4 shadow-sm">
+          <h3 className="font-bold text-sm mb-3 text-warning-foreground">結算摘要</h3>
           <div className="space-y-2">
             {stats.settlements.map((s, i) => (
               <div key={i} className="flex items-center gap-2 text-sm">
                 <UserAvatar avatarUrl={s.fromAvatarUrl} avatarEmoji={s.fromEmoji} size="xs" />
-                <span className="text-amber-700 dark:text-amber-300">{s.fromName}</span>
-                <ArrowRight className="h-3 w-3 text-amber-500" />
-                <span className="font-bold text-amber-800 dark:text-amber-300">{formatJPY(s.amount)}</span>
-                <ArrowRight className="h-3 w-3 text-amber-500" />
-                <span className="text-amber-700 dark:text-amber-300">{s.toName}</span>
+                <span className="text-warning-foreground/85">{s.fromName}</span>
+                <ArrowRight className="h-3 w-3 text-warning" />
+                <span className="font-bold text-warning-foreground">{formatJPY(s.amount)}</span>
+                <ArrowRight className="h-3 w-3 text-warning" />
+                <span className="text-warning-foreground/85">{s.toName}</span>
                 <UserAvatar avatarUrl={s.toAvatarUrl} avatarEmoji={s.toEmoji} size="xs" />
               </div>
             ))}
@@ -532,7 +532,7 @@ export default function SummaryPage() {
               <div key={card.name} className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-foreground">{card.name}</span>
-                  <span className="font-medium text-emerald-600">
+                  <span className="font-medium text-success">
                     +{formatTWD(card.cashback)}
                   </span>
                 </div>
@@ -548,7 +548,7 @@ export default function SummaryPage() {
                 {card.limit > 0 && (
                   <div className="h-1.5 rounded-full bg-muted">
                     <div
-                      className={`h-1.5 rounded-full transition-all ${card.cashback >= card.limit ? "bg-amber-400" : "bg-emerald-400"}`}
+                      className={`h-1.5 rounded-full transition-all ${card.cashback >= card.limit ? "bg-warning" : "bg-success"}`}
                       style={{ width: `${Math.min(Math.round((card.cashback / card.limit) * 100), 100)}%` }}
                     />
                   </div>
@@ -578,7 +578,7 @@ export default function SummaryPage() {
       {/* Recap link */}
       <Link
         href="/recap"
-        className="w-full flex items-center justify-center gap-2 rounded-xl bg-linear-to-r from-rose-500 to-primary py-3 text-sm font-medium text-white shadow-sm transition-colors"
+        className="w-full flex items-center justify-center gap-2 rounded-xl bg-primary py-3 text-sm font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
       >
         ✨ 查看旅後回顧
       </Link>

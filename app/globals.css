@@ -28,6 +28,7 @@
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-destructive: var(--destructive);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -59,11 +60,12 @@
 /* ================================================================= */
 /* Theme system                                                      */
 /*                                                                   */
-/* Two themes live side by side. The active theme is selected via    */
+/* Multiple themes live side by side. The active theme is selected via */
 /* the [data-theme] attribute on <html>, set by ThemeProvider.       */
 /*                                                                   */
 /*   - light : clean white + blue — default                          */
 /*   - dark  : near-black + indigo accent                            */
+/*   - japanese : washi ivory + vermillion editorial palette          */
 /*                                                                   */
 /* ================================================================= */
 
@@ -85,6 +87,7 @@
   --accent: #DBEAFE;
   --accent-foreground: #1E40AF;
   --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: #FFFFFF;
   --border: #E2E8F0;
   --input: #E2E8F0;
   --ring: #2563EB;
@@ -129,6 +132,7 @@
   --accent: #232330;
   --accent-foreground: #EDEDF0;
   --destructive: oklch(0.704 0.191 22.216);
+  --destructive-foreground: #0B0B0F;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: #818CF8;
@@ -152,6 +156,49 @@
   --success: oklch(0.696 0.17 162.48);
   --success-foreground: oklch(0.93 0.05 160.0);
   --success-subtle: oklch(0.26 0.06 160.0);
+}
+
+[data-theme="japanese"] {
+  /* Japanese editorial palette — washi ivory, sumi ink, vermillion, and gold accents */
+  --background: #F4EFE6;
+  --foreground: #171412;
+  --card: #FBF7EE;
+  --card-foreground: #171412;
+  --popover: #FBF7EE;
+  --popover-foreground: #171412;
+  --primary: #B83A26;
+  --primary-foreground: #FBF7EE;
+  --secondary: #E9DDC8;
+  --secondary-foreground: #171412;
+  --muted: #E9DDC8;
+  --muted-foreground: #6E6456;
+  --accent: #E8C5BA;
+  --accent-foreground: #8F2B1F;
+  --destructive: #C63D2F;
+  --destructive-foreground: #FBF7EE;
+  --border: #D9D1C0;
+  --input: #D9D1C0;
+  --ring: #B83A26;
+  --chart-1: #B83A26;
+  --chart-2: #B88932;
+  --chart-3: #B88932;
+  --chart-4: #5B6F55;
+  --chart-5: #8D8374;
+  --sidebar: #FBF7EE;
+  --sidebar-foreground: #171412;
+  --sidebar-primary: #B83A26;
+  --sidebar-primary-foreground: #FBF7EE;
+  --sidebar-accent: #E9DDC8;
+  --sidebar-accent-foreground: #171412;
+  --sidebar-border: #D9D1C0;
+  --sidebar-ring: #B83A26;
+  /* Semantic state tokens */
+  --warning: #B88932;
+  --warning-foreground: #4F3512;
+  --warning-subtle: #F5E7C6;
+  --success: #5B6F55;
+  --success-foreground: #23351F;
+  --success-subtle: #E1E9DC;
 }
 
 @layer base {

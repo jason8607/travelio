@@ -51,7 +51,7 @@ export function BigSummaryCard({
               <span
                 className={cn(
                   "text-[11px] font-semibold",
-                  isOver ? "text-red-500" : "text-muted-foreground"
+                  isOver ? "text-destructive" : "text-muted-foreground"
                 )}
               >
                 {percentage}%
@@ -62,10 +62,10 @@ export function BigSummaryCard({
                 className={cn(
                   "h-full w-full rounded-full transition-[transform] duration-500 origin-left",
                   isOver
-                    ? "bg-linear-to-r from-red-400 to-red-500"
+                    ? "bg-destructive"
                     : percentage > 80
-                      ? "bg-linear-to-r from-amber-400 to-orange-500"
-                      : "bg-linear-to-r from-rose-300 to-primary"
+                      ? "bg-warning"
+                      : "bg-primary"
                 )}
                 style={{ transform: `scaleX(${percentage / 100})` }}
               />

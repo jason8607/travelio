@@ -31,7 +31,7 @@ interface CardStat {
   planBreakdown: PlanStat[];
 }
 
-const maxedColor = "text-amber-500";
+const maxedColor = "text-warning";
 
 function calcCardStat(card: CreditCard, cardExpenses: Expense[]): CardStat {
   const hasPlans = !!card.plans && card.plans.length > 0;
@@ -188,7 +188,7 @@ export function CashbackChart({ expenses }: CashbackChartProps) {
                   className={cn(
                     "h-full w-full rounded-full transition-[transform] duration-500 origin-left",
                     isMaxed
-                      ? "bg-linear-to-r from-amber-400 to-amber-500"
+                      ? "bg-warning"
                       : "bg-linear-to-r from-primary/70 to-primary"
                   )}
                   style={{ transform: `scaleX(${progress / 100})` }}
@@ -245,7 +245,7 @@ export function CashbackChart({ expenses }: CashbackChartProps) {
         )}
 
         {stats.unassignedCount > 0 && (
-          <p className="text-[11px] text-amber-600 bg-amber-50 dark:text-amber-300 dark:bg-amber-500/10 rounded-lg px-3 py-2">
+          <p className="rounded-lg bg-warning-subtle px-3 py-2 text-[11px] text-warning-foreground">
             有 {stats.unassignedCount} 筆信用卡消費未指定卡片，不列入回饋計算
           </p>
         )}

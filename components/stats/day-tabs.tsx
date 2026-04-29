@@ -45,10 +45,10 @@ export function DayTabs({ dates, selected, onChange, tripStartDate }: DayTabsPro
         ref={selected === null ? activeRef : undefined}
         onClick={() => onChange(null)}
         className={cn(
-          "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
+          "shrink-0 px-4 py-2 rounded-full border text-sm font-medium transition-all",
           selected === null
-            ? "bg-foreground text-background shadow-sm dark:bg-primary dark:text-primary-foreground"
-            : "bg-muted text-muted-foreground hover:bg-muted"
+            ? "border-primary bg-primary text-primary-foreground shadow-sm"
+            : "border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
         )}
       >
         全部
@@ -61,10 +61,10 @@ export function DayTabs({ dates, selected, onChange, tripStartDate }: DayTabsPro
             ref={isActive ? activeRef : undefined}
             onClick={() => onChange(tab.key)}
             className={cn(
-              "shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-all",
+              "shrink-0 px-4 py-2 rounded-full border text-sm font-medium transition-all",
               isActive
-                ? "bg-foreground text-background shadow-sm dark:bg-primary dark:text-primary-foreground"
-                : "bg-muted text-muted-foreground hover:bg-muted"
+                ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                : "border-border bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             )}
           >
             {tab.label}

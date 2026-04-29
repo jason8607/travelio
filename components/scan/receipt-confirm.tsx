@@ -192,7 +192,7 @@ export function ReceiptConfirm({
               <button
                 type="button"
                 onClick={() => setAllOwner(null, "split")}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium border-amber-300 text-amber-800 bg-amber-50 dark:border-amber-500/50 dark:text-amber-300 dark:bg-amber-500/10"
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs font-medium border-primary/50 text-primary bg-primary/10"
               >
                 <Users className="h-3 w-3" /> 全部均分
               </button>
@@ -243,7 +243,7 @@ export function ReceiptConfirm({
                     </span>
                     <button
                       onClick={() => removeItem(index)}
-                      className="p-1 text-muted-foreground hover:text-red-500"
+                      className="p-1 text-muted-foreground hover:text-destructive"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </button>
@@ -326,7 +326,7 @@ export function ReceiptConfirm({
                       className={cn(
                         "flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-medium transition-all",
                         item.split_type === "split"
-                          ? "bg-amber-100 text-amber-800"
+                          ? "bg-primary/15 text-primary"
                           : "bg-card text-muted-foreground hover:text-muted-foreground"
                       )}
                     >

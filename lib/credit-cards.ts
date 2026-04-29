@@ -4,10 +4,6 @@ const STORAGE_KEY = "credit_cards";
 const SEEDED_KEY = "credit_cards_seeded";
 
 const DEFAULT_CARDS: Omit<CreditCard, "id">[] = [
-  { name: "中信 UNIOPEN",  cashback_rate: 11,  cashback_limit: 6250  },
-  { name: "永豐 幣倍卡",  cashback_rate: 6,   cashback_limit: 7500  },
-  { name: "玉山 熊本熊",  cashback_rate: 8.5, cashback_limit: 8333  },
-  { name: "星展 eco",     cashback_rate: 5,   cashback_limit: 15000 },
   {
     name: "台新 Richart",
     cashback_rate: 0,
@@ -34,6 +30,7 @@ const DEFAULT_CARDS: Omit<CreditCard, "id">[] = [
       { id: "", credit_card_id: "", name: "慶生月",    cashback_rate: 10 },
     ],
   },
+  { name: "玉山 熊本熊",  cashback_rate: 8.5, cashback_limit: 8333  },
 ];
 
 function seedDefaults(): CreditCard[] {

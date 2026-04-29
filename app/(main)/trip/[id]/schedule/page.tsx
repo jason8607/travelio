@@ -131,7 +131,7 @@ export default function SchedulePage() {
       <div>
         <PageHeader title="旅程日程" showBack />
         <div className="flex flex-col items-center justify-center min-h-[60vh] gap-2">
-          <p className="text-sm text-red-500">載入日程失敗，請返回重試</p>
+          <p className="text-sm text-destructive">載入日程失敗，請返回重試</p>
           <button onClick={() => router.back()} className="text-sm text-primary underline">返回</button>
         </div>
       </div>
@@ -186,7 +186,7 @@ export default function SchedulePage() {
                 <button
                   onClick={() => removeScheduleItem(index)}
                   aria-label="刪除此日行程"
-                  className="p-1.5 text-muted-foreground/60 hover:text-red-500 transition-colors"
+                  className="p-1.5 text-muted-foreground/60 hover:text-destructive transition-colors"
                 >
                   <Trash2 className="h-3.5 w-3.5" />
                 </button>
