@@ -9,10 +9,11 @@ import { TopExpenses } from "@/components/stats/top-expenses";
 import { CashbackChart } from "@/components/stats/cashback-chart";
 import { DayTabs, PRE_TRIP_KEY } from "@/components/stats/day-tabs";
 import { AuthRequiredState } from "@/components/layout/auth-required-state";
+import { EmptyState } from "@/components/layout/empty-state";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
 import { formatDateLabel, isPreTripDate } from "@/lib/utils";
 import Link from "next/link";
-import { BarChart3, ClipboardList } from "lucide-react";
+import { BarChart3, ClipboardList, Plane, ReceiptText } from "lucide-react";
 
 export default function StatsPage() {
   const { user, currentTrip, isGuest, loading: ctxLoading } = useApp();
@@ -54,19 +55,25 @@ export default function StatsPage() {
     }
 
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-muted-foreground">
-        <p className="text-4xl mb-2">📊</p>
-        <p className="text-sm">請先建立旅程</p>
-      </div>
+      <EmptyState
+        icon={Plane}
+        title="先建立一趟旅程"
+        description="旅程建立後，統計頁會整理分類支出、付款方式與信用卡回饋。"
+        action={{ label: "建立旅程", href: "/trip/new" }}
+        className="min-h-full"
+      />
     );
   }
 
   if (expenses.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-muted-foreground">
-        <p className="text-4xl mb-2">📊</p>
-        <p className="text-sm">還沒有消費紀錄，統計數據會在這裡顯示</p>
-      </div>
+      <EmptyState
+        icon={ReceiptText}
+        title="還沒有統計資料"
+        description="新增第一筆消費後，分類、付款方式與回饋分析會出現在這裡。"
+        action={{ label: "新增消費", href: "/records/new" }}
+        className="min-h-full"
+      />
     );
   }
 
@@ -77,43 +84,45 @@ export default function StatsPage() {
     : null;
 
   return (
-    <div className="space-y-4 p-4 pb-4">
-      <DayTabs dates={dates} selected={selectedDate} onChange={setSelectedDate} tripStartDate={currentTrip?.start_date} />
+    <div className="pb-4">
+      <div className="space-y-4 px-4">
+        <DayTabs dates={dates} selected={selectedDate} onChange={setSelectedDate} tripStartDate={currentTrip?.start_date} />
 
-      <div className="rounded-2xl border bg-card p-4 shadow-sm text-center">
-        <p className="text-xs text-muted-foreground mb-1">
-          {dateLabel ? `${dateLabel} 花費` : "全部花費"}
-        </p>
-        <p className="text-2xl font-bold">{formatJPY(totalJpy)}</p>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          ≈ {formatTWD(totalTwd)} · {filtered.length} 筆
-        </p>
+        <div className="rounded-2xl border bg-card p-4 shadow-sm text-center">
+          <p className="text-xs text-muted-foreground mb-1">
+            {dateLabel ? `${dateLabel} 花費` : "全部花費"}
+          </p>
+          <p className="text-2xl font-bold">{formatJPY(totalJpy)}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            ≈ {formatTWD(totalTwd)} · {filtered.length} 筆
+          </p>
+        </div>
+
+        <CategoryChart
+          expenses={filtered}
+          title={dateLabel ? `${dateLabel} 分類支出` : "分類支出"}
+        />
+
+        <PaymentChart
+          expenses={filtered}
+          title={dateLabel ? `${dateLabel} 支付方式` : "支付方式"}
+        />
+
+        <TopExpenses
+          expenses={filtered}
+          title={dateLabel ? `${dateLabel} 花費排名` : "花費排名"}
+        />
+
+        <CashbackChart expenses={expenses} />
+
+        <Link
+          href="/summary"
+          className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm transition-colors"
+        >
+          <ClipboardList className="h-4 w-4 text-primary" />
+          查看旅行總結
+        </Link>
       </div>
-
-      <CategoryChart
-        expenses={filtered}
-        title={dateLabel ? `${dateLabel} 分類支出` : "分類支出"}
-      />
-
-      <PaymentChart
-        expenses={filtered}
-        title={dateLabel ? `${dateLabel} 支付方式` : "支付方式"}
-      />
-
-      <TopExpenses
-        expenses={filtered}
-        title={dateLabel ? `${dateLabel} 花費排名` : "花費排名"}
-      />
-
-      <CashbackChart expenses={expenses} />
-
-      <Link
-        href="/summary"
-        className="flex items-center justify-center gap-2 rounded-2xl border border-border bg-card py-3.5 text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground shadow-sm transition-colors"
-      >
-        <ClipboardList className="h-4 w-4 text-primary" />
-        查看旅行總結
-      </Link>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { PageHeader } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/layout/empty-state";
 import {
   WrappedCard,
   type WrappedCardVariant,
@@ -23,9 +23,10 @@ import {
   ArrowRight,
   Download,
   Loader2,
+  Plane,
+  Receipt,
   Share2,
 } from "lucide-react";
-import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -382,19 +383,23 @@ export default function RecapPage() {
 
   if (!currentTrip) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-2 text-muted-foreground">
-        <Image src="/icon-transparent.png" alt="旅帳" width={56} height={56} />
-        <span className="text-sm">請先選擇旅程</span>
-      </div>
+      <EmptyState
+        icon={Plane}
+        title="先建立一趟旅程"
+        description="有了旅程與消費紀錄後，就能產生可以分享的旅行回顧卡片。"
+        action={{ label: "建立旅程", href: "/trip/new" }}
+      />
     );
   }
 
   if (!stats || !wrapped) {
     return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-2 text-muted-foreground">
-        <span className="text-4xl">📝</span>
-        <span className="text-sm">尚無消費紀錄</span>
-      </div>
+      <EmptyState
+        icon={Receipt}
+        title="還沒有回顧素材"
+        description="新增消費後，這裡會把旅程花費變成可分享的亮點卡片。"
+        action={{ label: "新增消費", href: "/records/new" }}
+      />
     );
   }
 
@@ -409,7 +414,6 @@ export default function RecapPage() {
 
   return (
     <>
-      <PageHeader title="旅後回顧" showBack />
       <div className="px-4 pb-8">
         <div className="text-center pt-2 pb-6">
           <div className="text-[11px] tracking-[0.2em] text-muted-foreground">

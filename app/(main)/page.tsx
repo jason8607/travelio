@@ -2,6 +2,7 @@
 
 import { BigSummaryCard } from "@/components/dashboard/big-summary-card";
 import { ExpenseCard } from "@/components/expense/expense-card";
+import { EmptyState } from "@/components/layout/empty-state";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { useCategories } from "@/hooks/use-categories";
 import { useCreditCards } from "@/hooks/use-credit-cards";
@@ -11,7 +12,7 @@ import { useApp } from "@/lib/context";
 import { FALLBACK_RATE, formatJPY, formatTWD, getExchangeRate } from "@/lib/exchange-rate";
 import { deleteGuestExpense } from "@/lib/guest-storage";
 import { differenceInDays, parseISO } from "date-fns";
-import { Plus } from "lucide-react";
+import { Plane, Plus, ReceiptText } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -100,19 +101,13 @@ export default function HomePage() {
 
   if (!currentTrip) {
     return (
-      <div className="flex flex-col items-center justify-center h-full px-4">
-        <div className="text-5xl mb-4">✈️</div>
-        <h2 className="text-xl font-bold mb-2">建立你的第一趟旅程</h2>
-        <p className="text-muted-foreground text-sm mb-6 text-center">
-          設定旅程日期和預算，開始記帳吧！
-        </p>
-        <Link
-          href="/trip/new"
-          className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-medium"
-        >
-          建立旅程
-        </Link>
-      </div>
+      <EmptyState
+        icon={Plane}
+        title="建立你的第一趟旅程"
+        description="設定旅程日期和預算，開始記錄每一筆日本旅行花費。"
+        action={{ label: "建立旅程", href: "/trip/new" }}
+        className="h-full"
+      />
     );
   }
 
@@ -212,9 +207,13 @@ export default function HomePage() {
           )}
         </div>
         {recent.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border py-10 text-center text-xs text-muted-foreground">
-            還沒有記錄，點下方 + 新增第一筆
-          </div>
+          <EmptyState
+            icon={ReceiptText}
+            title="還沒有消費紀錄"
+            description="點下方 + 新增第一筆，首頁就會開始顯示最近消費。"
+            variant="section"
+            className="px-0"
+          />
         ) : (
           <div className="space-y-2">
             {recent.map((e) => (

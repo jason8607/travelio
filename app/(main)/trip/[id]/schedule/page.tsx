@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, MapPin } from "lucide-react";
@@ -128,20 +127,15 @@ export default function SchedulePage() {
 
   if (loadError) {
     return (
-      <div>
-        <PageHeader title="旅程日程" showBack />
-        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-2">
-          <p className="text-sm text-destructive">載入日程失敗，請返回重試</p>
-          <button onClick={() => router.back()} className="text-sm text-primary underline">返回</button>
-        </div>
+      <div className="flex flex-col items-center justify-center min-h-[60vh] gap-2">
+        <p className="text-sm text-destructive">載入日程失敗，請返回重試</p>
+        <button onClick={() => router.back()} className="text-sm text-primary underline">返回</button>
       </div>
     );
   }
 
   return (
     <div>
-      <PageHeader title="旅程日程" showBack />
-
       <div className="p-4 space-y-4">
         {/* 說明卡片 */}
         <div className="rounded-2xl bg-primary/10 border border-primary/20 p-4">

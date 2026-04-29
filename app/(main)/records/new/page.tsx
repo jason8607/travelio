@@ -2,7 +2,6 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
-import { PageHeader } from "@/components/layout/page-header";
 import { ExpenseForm } from "@/components/expense/expense-form";
 import { useApp } from "@/lib/context";
 import { getGuestExpenses } from "@/lib/guest-storage";
@@ -54,12 +53,7 @@ function ExpensePageContent() {
     );
   }
 
-  return (
-    <div>
-      <PageHeader title={editExpense ? "編輯消費" : "新增消費"} showBack />
-      <ExpenseForm editExpense={editExpense} />
-    </div>
-  );
+  return <ExpenseForm editExpense={editExpense} />;
 }
 
 export default function NewExpensePage() {

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -75,8 +74,6 @@ export default function InvitePage() {
 
   return (
     <div>
-      <PageHeader title="邀請成員" subtitle="邀請旅伴加入記帳" showBack />
-
       <div className="p-4 space-y-4">
         <div className="rounded-2xl border bg-card p-4 shadow-sm">
           <h3 className="font-bold flex items-center gap-2 mb-3">

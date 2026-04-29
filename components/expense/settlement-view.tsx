@@ -1,10 +1,11 @@
 "use client";
 
+import { EmptyState } from "@/components/layout/empty-state";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { useCategories } from "@/hooks/use-categories";
 import { calculateSettlements } from "@/lib/settlement";
 import type { Expense, TripMember } from "@/types";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, ReceiptText, Users } from "lucide-react";
 import { useMemo } from "react";
 
 interface SettlementViewProps {
@@ -51,19 +52,23 @@ export function SettlementView({
 
   if (tripMembers.length < 2) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-        <p className="text-4xl mb-2">👥</p>
-        <p className="text-sm">需要至少 2 位成員才能結算</p>
-      </div>
+      <EmptyState
+        icon={Users}
+        title="還不能進行結算"
+        description="邀請至少 1 位旅伴加入後，就能產生多人分帳結算。"
+        variant="section"
+      />
     );
   }
 
   if (expenses.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-        <p className="text-4xl mb-2">💰</p>
-        <p className="text-sm">還沒有消費紀錄</p>
-      </div>
+      <EmptyState
+        icon={ReceiptText}
+        title="還沒有可結算的消費"
+        description="新增消費並設定付款人後，這裡會自動計算最小轉帳方案。"
+        action={{ label: "新增消費", href: "/records/new" }}
+      />
     );
   }
 
@@ -130,7 +135,7 @@ export function SettlementView({
             {settlements.map((s, i) => (
               <div
                 key={i}
-                className="rounded-xl border border-dashed border-primary/40 bg-primary/[0.03] p-3 flex items-center gap-3"
+                className="rounded-xl border border-dashed border-primary/40 bg-primary/3 p-3 flex items-center gap-3"
               >
                 <div className="flex items-center gap-2 min-w-0">
                   <UserAvatar

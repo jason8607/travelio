@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/lib/context";
 import { AuthRequiredState } from "@/components/layout/auth-required-state";
-import { PageHeader } from "@/components/layout/page-header";
+import { EmptyState } from "@/components/layout/empty-state";
 import { ReceiptUpload } from "@/components/scan/receipt-upload";
 import { ReceiptConfirm } from "@/components/scan/receipt-confirm";
 import type { ReceiptItemWithOwner } from "@/components/scan/receipt-confirm";
@@ -193,32 +193,15 @@ export default function ScanPage() {
   const guestOcrRemaining = guestOcrLimit - guestOcrCount;
 
   return (
-    <div className="pb-4">
-      <PageHeader
-        title="掃描收據"
-        subtitle={isGuest ? `訪客模式・剩餘 ${guestOcrRemaining} 次掃描` : "拍照或上傳收據圖片"}
-        showBack={!!ocrResult}
-      />
-
+    <div className="flex min-h-full flex-col pb-4">
       {isGuest && guestOcrRemaining <= 0 && !ocrResult ? (
-        <div className="flex flex-col items-center justify-center min-h-[40vh] px-6 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-warning-subtle flex items-center justify-center mb-4">
-            <CameraIcon className="h-8 w-8 text-warning" />
-          </div>
-          <h2 className="text-lg font-bold text-foreground mb-2">
-            訪客掃描次數已用完
-          </h2>
-          <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-            訪客模式最多可掃描 {guestOcrLimit} 張收據<br />
-            登入後可享每日 50 次掃描額度
-          </p>
-          <a
-            href="/auth/login"
-            className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-medium transition-colors"
-          >
-            登入 / 註冊
-          </a>
-        </div>
+        <EmptyState
+          icon={CameraIcon}
+          title="訪客掃描次數已用完"
+          description={`訪客模式最多可掃描 ${guestOcrLimit} 張收據，登入後可享每日 50 次掃描額度。`}
+          action={{ label: "登入 / 註冊", href: "/auth/login" }}
+          className="flex-1"
+        />
       ) : ocrResult ? (
         <>
           <div className="px-4 mb-4">
@@ -235,10 +218,13 @@ export default function ScanPage() {
           />
         </>
       ) : (
-        <ReceiptUpload
-          onImageSelected={handleImageSelected}
-          isProcessing={isProcessing}
-        />
+        <div className="flex flex-1 items-center">
+          <ReceiptUpload
+            onImageSelected={handleImageSelected}
+            isProcessing={isProcessing}
+            className="w-full"
+          />
+        </div>
       )}
     </div>
   );

@@ -6,12 +6,12 @@ import { ExpenseList } from "@/components/expense/expense-list";
 import { MemberSummary } from "@/components/expense/member-summary";
 import { SettlementView } from "@/components/expense/settlement-view";
 import { AuthRequiredState } from "@/components/layout/auth-required-state";
+import { EmptyState } from "@/components/layout/empty-state";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useExpenses } from "@/hooks/use-expenses";
 import { useApp } from "@/lib/context";
-import { exportExpensesToCSV } from "@/lib/export";
 import { deleteGuestExpense } from "@/lib/guest-storage";
-import { ClipboardList, Download, Plus } from "lucide-react";
+import { ClipboardList, Plane, Plus } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -94,32 +94,20 @@ export default function RecordsPage() {
     );
   }
 
+  if (!currentTrip) {
+    return (
+      <EmptyState
+        icon={Plane}
+        title="先建立一趟旅程"
+        description="建立旅程後，就能開始新增、篩選與管理所有消費紀錄。"
+        action={{ label: "建立旅程", href: "/trip/new" }}
+      />
+    );
+  }
+
   return (
     <div className="relative flex h-full flex-col">
       <div className="flex-1 min-h-0 overflow-y-auto pb-4">
-        <div className="px-4 pt-4 mb-4">
-          <div className="flex items-center justify-between mb-1">
-            <Link
-              href="/"
-              className="text-sm text-primary"
-            >
-              ← 返回首頁
-            </Link>
-            {expenses.length > 0 && (
-              <button
-                onClick={() => {
-                  exportExpensesToCSV(filtered, currentTrip?.name || "旅程", tripMembers);
-                  toast.success("CSV 已下載");
-                }}
-                className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"
-              >
-                <Download className="h-3.5 w-3.5" />
-                匯出
-              </button>
-            )}
-          </div>
-        </div>
-
         <div className="px-4 mb-3">
           <ExpenseFilter
             onChange={setFilter}
@@ -159,7 +147,17 @@ export default function RecordsPage() {
         ) : groupBy === "member" ? (
           <MemberSummary expenses={filtered} tripMembers={tripMembers} onDelete={handleDelete} />
         ) : (
-          <ExpenseList expenses={filtered} groupBy={groupBy} onDelete={handleDelete} />
+          <ExpenseList
+            expenses={filtered}
+            groupBy={groupBy}
+            onDelete={handleDelete}
+            emptyTitle={expenses.length === 0 ? "還沒有消費紀錄" : "找不到符合條件的紀錄"}
+            emptyDescription={
+              expenses.length === 0
+                ? "新增第一筆消費後，這裡會依日期或類別整理你的花費。"
+                : "調整篩選條件或清除搜尋，就能看到更多消費紀錄。"
+            }
+          />
         )}
       </div>
 

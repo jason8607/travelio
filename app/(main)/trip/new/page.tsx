@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/lib/context";
-import { PageHeader } from "@/components/layout/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -57,7 +56,6 @@ export default function NewTripPage() {
 
   return (
     <div>
-      <PageHeader title="建立新旅程" showBack />
       <form onSubmit={handleSubmit} className="space-y-4 p-4">
         <div className="space-y-2">
           <Label htmlFor="name">旅程名稱</Label>

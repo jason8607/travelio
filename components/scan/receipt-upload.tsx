@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Camera, Sparkles, Upload } from "lucide-react";
 import Image from "next/image";
 import { useRef, useState } from "react";
@@ -9,11 +10,13 @@ import { toast } from "sonner";
 interface ReceiptUploadProps {
   onImageSelected: (base64: string, mimeType: string, file: File) => void;
   isProcessing: boolean;
+  className?: string;
 }
 
 export function ReceiptUpload({
   onImageSelected,
   isProcessing,
+  className,
 }: ReceiptUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -43,7 +46,7 @@ export function ReceiptUpload({
   };
 
   return (
-    <div className="space-y-4">
+    <div className={cn("space-y-4", className)}>
       {preview ? (
         <div className="relative mx-4 rounded-2xl border bg-card p-4 shadow-sm">
           <div className="relative w-full aspect-3/4 rounded-xl overflow-hidden bg-muted">
@@ -106,9 +109,9 @@ export function ReceiptUpload({
           )}
         </div>
       ) : (
-        <div className="mx-4 rounded-2xl border-2 border-dashed border-border bg-muted p-10">
+        <div className="mx-4 rounded-3xl border-2 border-dashed border-border bg-card p-10 shadow-sm">
           <div className="flex flex-col items-center gap-4">
-            <div className="rounded-full bg-primary/10 p-4">
+            <div className="rounded-2xl bg-primary/10 p-4">
               <Camera className="h-8 w-8 text-primary" />
             </div>
             <div className="text-center">

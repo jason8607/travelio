@@ -1,5 +1,6 @@
 "use client";
 
+import { EmptyState } from "@/components/layout/empty-state";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -184,12 +185,12 @@ export function CreditCardManager() {
       </div>
 
       {cards.length === 0 && !showForm ? (
-        <div className="px-4 py-6 text-center">
-          <p className="text-sm text-muted-foreground">尚未設定信用卡</p>
-          <p className="text-xs text-muted-foreground mt-1">
-            新增信用卡以追蹤各卡回饋上限
-          </p>
-        </div>
+        <EmptyState
+          icon={CreditCardIcon}
+          title="尚未設定信用卡"
+          description="新增信用卡後，就能追蹤各卡回饋比例與上限。"
+          variant="section"
+        />
       ) : (
         <div className="divide-y divide-border/60">
           {cards.map((card) => (

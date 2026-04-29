@@ -1,28 +1,40 @@
 "use client";
 
+import { EmptyState } from "@/components/layout/empty-state";
 import { ExpenseCard } from "./expense-card";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
 import { formatDateLabel } from "@/lib/utils";
 import { useCategories } from "@/hooks/use-categories";
 import { useApp } from "@/lib/context";
-import type { Expense, CategoryItem } from "@/types";
+import type { Expense } from "@/types";
+import { ReceiptText } from "lucide-react";
 
 interface ExpenseListProps {
   expenses: Expense[];
   groupBy: "date" | "category";
   onDelete?: (id: string) => Promise<void>;
+  emptyTitle?: string;
+  emptyDescription?: string;
 }
 
-export function ExpenseList({ expenses, groupBy, onDelete }: ExpenseListProps) {
+export function ExpenseList({
+  expenses,
+  groupBy,
+  onDelete,
+  emptyTitle = "還沒有消費紀錄",
+  emptyDescription = "新增第一筆消費後，這裡會依日期或類別整理你的花費。",
+}: ExpenseListProps) {
   const { categories } = useCategories();
   const { currentTrip } = useApp();
 
   if (expenses.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-        <p className="text-4xl mb-2">📝</p>
-        <p className="text-sm">還沒有消費紀錄</p>
-      </div>
+      <EmptyState
+        icon={ReceiptText}
+        title={emptyTitle}
+        description={emptyDescription}
+        action={{ label: "新增消費", href: "/records/new" }}
+      />
     );
   }
 

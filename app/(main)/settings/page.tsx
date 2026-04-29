@@ -335,8 +335,8 @@ export default function SettingsPage() {
 
   if (isGuest) {
     return (
-      <div className="space-y-4 p-4 pb-4">
-        <h1 className="text-xl font-bold">設定</h1>
+      <div className="pb-4">
+        <div className="space-y-4 px-4">
 
         {/* Guest trip editing */}
         {currentTrip && (
@@ -453,13 +453,14 @@ export default function SettingsPage() {
           <LogOut className="h-4 w-4 mr-2" />
           結束試用
         </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4 p-4 pb-4">
-      <h1 className="text-xl font-bold">設定</h1>
+    <div className="pb-4">
+      <div className="space-y-4 px-4">
 
       {/* ===== 旅程切換 ===== */}
       <div className="rounded-2xl border bg-card shadow-sm overflow-hidden">
@@ -732,6 +733,7 @@ export default function SettingsPage() {
         <LogOut className="h-4 w-4 mr-2" />
         登出
       </Button>
+      </div>
 
       <Dialog open={!!removeTarget} onOpenChange={(open) => { if (!open) setRemoveTarget(null); }}>
         <DialogContent showCloseButton={false}>

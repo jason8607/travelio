@@ -1,5 +1,6 @@
 "use client";
 
+import { EmptyState } from "@/components/layout/empty-state";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { useCategories } from "@/hooks/use-categories";
 import { useCreditCards } from "@/hooks/use-credit-cards";
@@ -278,34 +279,31 @@ export default function SummaryPage() {
 
   if (!currentTrip) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-muted-foreground">
-        <p className="text-4xl mb-2">📋</p>
-        <p className="text-sm">請先建立旅程</p>
-      </div>
+      <EmptyState
+        icon={Plane}
+        title="先建立一趟旅程"
+        description="旅程建立後，這裡會整理花費摘要、分類比例與結算資訊。"
+        action={{ label: "建立旅程", href: "/trip/new" }}
+      />
     );
   }
 
   if (!stats) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-muted-foreground">
-        <p className="text-4xl mb-2">📋</p>
-        <p className="text-sm">還沒有消費紀錄，無法產生總結</p>
-      </div>
+      <EmptyState
+        icon={Receipt}
+        title="還沒有可總結的資料"
+        description="新增消費後，旅程總結會自動產生花費亮點與分帳結果。"
+        action={{ label: "新增消費", href: "/records/new" }}
+      />
     );
   }
 
   const DAY_LABELS = ["日", "一", "二", "三", "四", "五", "六"];
 
   return (
-    <div className="space-y-4 p-4 pb-8">
-      {/* Back button — outside capturable area */}
-      <div className="text-center relative">
-        <Link href="/" className="text-sm text-primary absolute left-0 top-0">
-          ← 返回
-        </Link>
-        <div className="h-5" />
-      </div>
-
+    <div className="pb-8">
+      <div className="space-y-4 px-4">
       {/* Capturable content area */}
       <div ref={captureRef} className="space-y-4 bg-muted rounded-2xl p-4">
       {/* Header */}
@@ -598,6 +596,7 @@ export default function SummaryPage() {
       <p className="text-center text-[11px] text-muted-foreground">
         {currentTrip.name} · 旅行總結
       </p>
+      </div>
     </div>
   );
 }

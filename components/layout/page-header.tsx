@@ -13,32 +13,29 @@ interface PageHeaderProps {
 
 export function PageHeader({
   title,
-  subtitle,
   showBack,
   right,
 }: PageHeaderProps) {
   const router = useRouter();
 
   return (
-    <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-lg px-4 pt-2 pb-3">
-      <div className="relative flex items-center justify-center min-h-[40px]">
+    <header className="shrink-0 border-b bg-card">
+      <div className="relative flex h-14 items-center justify-center px-4">
         {showBack && (
           <button
             onClick={() => router.back()}
             aria-label="返回上一頁"
-            className="absolute left-0 flex items-center text-sm text-primary"
+            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
           >
             <ChevronLeft className="h-5 w-5" />
-            <span>返回</span>
           </button>
         )}
-        <div className="text-center">
-          <h1 className="text-lg font-bold">{title}</h1>
-          {subtitle && (
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
-          )}
+        <div className="min-w-0 max-w-[calc(100%-6rem)] text-center">
+          <h1 className="truncate text-xl font-bold tracking-tight text-foreground">
+            {title}
+          </h1>
         </div>
-        {right && <div className="absolute right-0">{right}</div>}
+        {right && <div className="absolute right-4">{right}</div>}
       </div>
     </header>
   );

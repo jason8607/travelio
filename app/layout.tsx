@@ -1,11 +1,11 @@
-import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { InstallPrompt } from "@/components/layout/install-prompt";
+import { ServiceWorkerRegister } from "@/components/layout/sw-register";
 import { Toaster } from "@/components/ui/sonner";
 import { AppProvider } from "@/lib/context";
-import { ThemeProvider, THEME_INIT_SCRIPT } from "@/lib/theme-context";
-import { ServiceWorkerRegister } from "@/components/layout/sw-register";
-import { InstallPrompt } from "@/components/layout/install-prompt";
+import { THEME_INIT_SCRIPT, ThemeProvider } from "@/lib/theme-context";
 import { Analytics } from "@vercel/analytics/next";
+import type { Metadata, Viewport } from "next";
+import { Geist } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -54,7 +54,7 @@ export default function RootLayout({
         {/* Apply the user's saved theme before React hydrates to avoid FOUC. */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
       </head>
-      <body className="h-full font-sans antialiased bg-muted">
+      <body className="h-full font-sans antialiased bg-background">
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:rounded-md focus:bg-primary focus:text-primary-foreground focus:text-sm focus:font-medium"

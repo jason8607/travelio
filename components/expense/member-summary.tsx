@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { EmptyState } from "@/components/layout/empty-state";
 import { ExpenseCard } from "./expense-card";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
-import { ChevronDown, ChevronUp, Users } from "lucide-react";
+import { ChevronDown, ChevronUp, ReceiptText, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Expense, TripMember } from "@/types";
 
@@ -68,10 +69,12 @@ export function MemberSummary({ expenses, tripMembers, onDelete }: MemberSummary
 
   if (expenses.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
-        <p className="text-4xl mb-2">📝</p>
-        <p className="text-sm">還沒有消費紀錄</p>
-      </div>
+      <EmptyState
+        icon={ReceiptText}
+        title="還沒有成員花費"
+        description="新增消費並選擇歸屬成員後，這裡會整理每個人的花費。"
+        action={{ label: "新增消費", href: "/records/new" }}
+      />
     );
   }
 

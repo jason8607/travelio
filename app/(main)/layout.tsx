@@ -1,5 +1,6 @@
-import { BottomNav } from "@/components/layout/bottom-nav";
 import { GuestMigrationDialog } from "@/components/layout/guest-migration-dialog";
+import { MainShell } from "@/components/layout/main-shell";
+import { Suspense } from "react";
 
 export default function MainLayout({
   children,
@@ -7,10 +8,11 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex h-dvh flex-col">
-      <main className="flex-1 min-h-0 overflow-y-auto">{children}</main>
-      <BottomNav />
+    <>
+      <Suspense>
+        <MainShell>{children}</MainShell>
+      </Suspense>
       <GuestMigrationDialog />
-    </div>
+    </>
   );
 }
