@@ -1,36 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useApp } from "@/lib/context";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
-import { toast } from "sonner";
-import { getExchangeRate, jpyToTwd, twdToJpy } from "@/lib/exchange-rate";
-import { addGuestExpense, updateGuestExpense, deleteGuestExpense } from "@/lib/guest-storage";
-import type { Category, PaymentMethod, SplitType, Expense } from "@/types";
-import { Trash2, MapPin, Store, Users, Image as ImageIcon } from "lucide-react";
-import { cn, getPreTripDate, isPreTripDate } from "@/lib/utils";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { UserAvatar } from "@/components/ui/user-avatar";
+import { useApp } from "@/lib/context";
+import { getExchangeRate, jpyToTwd, twdToJpy } from "@/lib/exchange-rate";
+import { addGuestExpense, deleteGuestExpense, updateGuestExpense } from "@/lib/guest-storage";
+import { cn, getPreTripDate, isPreTripDate } from "@/lib/utils";
+import type { Category, Expense, PaymentMethod, SplitType } from "@/types";
+import { Image as ImageIcon, MapPin, Store, Trash2, Users } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
+import { Textarea } from "../ui/textarea";
 import { CategoryGrid } from "./category-grid";
-import { PaymentChips } from "./payment-chips";
 import { CreditCardPicker } from "./credit-card-picker";
+import { PaymentChips } from "./payment-chips";
 
 interface ExpenseFormProps {
   editExpense?: Expense | null;
@@ -412,12 +406,12 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
       {/* 備註 */}
       <div className="space-y-1.5">
         <Label htmlFor="note" className="text-sm font-medium text-muted-foreground">備註</Label>
-        <Input
+        <Textarea
           id="note"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="選填"
-          className="h-11 rounded-xl border-border focus-visible:ring-primary"
+          className="h-24 rounded-xl border-border focus-visible:ring-primary"
         />
       </div>
 
@@ -480,36 +474,29 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
 
       {/* 誰付的 */}
       {!isGuest && tripMembers.length > 1 && (
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Label className="text-sm font-medium text-muted-foreground">誰付的</Label>
-          <Select value={paidBy} onValueChange={(v) => { if (v) setPaidBy(v); }}>
-            <SelectTrigger className="h-11 rounded-xl border-border focus:ring-primary">
-              <SelectValue>
-                {(value: string) => {
-                  const member = tripMembers.find((m) => m.user_id === value);
-                  if (!member) return "選擇成員";
-                  return (
-                    <span className="flex items-center gap-1.5">
-                      <UserAvatar avatarUrl={member.profile?.avatar_url} avatarEmoji={member.profile?.avatar_emoji} size="xs" />
-                      {member.profile?.display_name || "成員"}
-                    </span>
-                  );
-                }}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent>
-              {tripMembers.map((m) => (
-                <SelectItem
+          <div className="flex flex-wrap gap-2">
+            {tripMembers.map((m) => {
+              const isSelected = paidBy === m.user_id;
+              return (
+                <button
                   key={m.user_id}
-                  value={m.user_id}
-                  label={`${m.profile?.avatar_emoji || "🧑"} ${m.profile?.display_name || "成員"}`}
+                  type="button"
+                  onClick={() => setPaidBy(m.user_id)}
+                  className={cn(
+                    "flex items-center gap-1.5 px-3 py-2.5 rounded-xl border-2 transition-all duration-200 text-sm font-medium",
+                    isSelected
+                      ? "border-primary/50 bg-primary/10 text-primary"
+                      : "border-border/60 bg-card text-muted-foreground hover:bg-muted"
+                  )}
                 >
-                  <UserAvatar avatarUrl={m.profile?.avatar_url} avatarEmoji={m.profile?.avatar_emoji} size="xs" className="inline-flex" />
-                  {m.profile?.display_name || "成員"}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                  <UserAvatar avatarUrl={m.profile?.avatar_url} avatarEmoji={m.profile?.avatar_emoji} size="xs" />
+                  {m.user_id === user?.id ? "我付的" : m.profile?.display_name || "成員"}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 

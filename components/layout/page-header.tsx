@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -25,9 +24,10 @@ export function PageHeader({
           <button
             onClick={() => router.back()}
             aria-label="返回上一頁"
-            className="absolute left-4 flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+            className="absolute left-4 flex h-9 items-center gap-1 rounded-lg px-2 text-sm font-medium text-muted-foreground transition-colors"
           >
-            <ChevronLeft className="h-5 w-5" />
+            <span aria-hidden="true" className="text-lg leading-none">←</span>
+            <span>返回</span>
           </button>
         )}
         <div className="min-w-0 max-w-[calc(100%-6rem)] text-center">
