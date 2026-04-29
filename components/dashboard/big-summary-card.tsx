@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
 import { cn } from "@/lib/utils";
 
@@ -24,8 +23,7 @@ export function BigSummaryCard({
   const isOver = hasBudget && totalJpy > budgetJpy!;
 
   return (
-    <Link href="/records" className="block mx-4">
-      <div className="rounded-xl bg-card p-5 ring-1 ring-foreground/10">
+    <div className=" mx-4 rounded-xl bg-card p-5 ring-1 ring-foreground/10">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-xs text-muted-foreground font-medium">旅程總支出</p>
@@ -72,7 +70,6 @@ export function BigSummaryCard({
             </div>
           </div>
         )}
-      </div>
-    </Link>
+    </div>
   );
 }

@@ -175,14 +175,12 @@ export default function HomePage() {
             {formatJPY(todayTotal)}
           </p>
         </div>
-        <Link href="/stats" className="block">
-          <div className="rounded-xl bg-card ring-1 ring-foreground/10 px-4 py-3.5 h-full">
-            <p className="text-[11px] text-muted-foreground font-medium">回饋</p>
-            <p className="text-xl font-bold text-success tracking-tight mt-1.5">
+        <div className="rounded-xl bg-card ring-1 ring-foreground/10 px-4 py-3.5 h-full">
+          <p className="text-[11px] text-muted-foreground font-medium">回饋</p>
+          <p className="text-xl font-bold text-success tracking-tight mt-1.5">
               {cards.length > 0 ? formatTWD(cashbackTotal) : "—"}
-            </p>
-          </div>
-        </Link>
+          </p>
+        </div>
       </div>
 
       {/* 最近消費 */}
