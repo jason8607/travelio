@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { LoadingState } from "@/components/layout/loading-state";
 import { useApp } from "@/lib/context";
 import { toast } from "sonner";
 import type { Trip } from "@/types";
@@ -90,11 +91,7 @@ export default function JoinTripPage() {
   };
 
   if (loading || appLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-4xl animate-pulse">✈️</div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (error || !trip) {

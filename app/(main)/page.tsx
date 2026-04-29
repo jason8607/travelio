@@ -3,6 +3,7 @@
 import { BigSummaryCard } from "@/components/dashboard/big-summary-card";
 import { ExpenseCard } from "@/components/expense/expense-card";
 import { EmptyState } from "@/components/layout/empty-state";
+import { LoadingState } from "@/components/layout/loading-state";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { useCategories } from "@/hooks/use-categories";
 import { useCreditCards } from "@/hooks/use-credit-cards";
@@ -54,16 +55,7 @@ export default function HomePage() {
   };
 
   if (appLoading || loading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-center">
-          <div className="mb-2 animate-pulse inline-flex">
-            <Image src="/icon-transparent.png" alt="旅帳" width={48} height={48} priority />
-          </div>
-          <p className="text-sm text-muted-foreground">載入中...</p>
-        </div>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!user && !isGuest) {

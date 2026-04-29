@@ -10,6 +10,7 @@ import { CashbackChart } from "@/components/stats/cashback-chart";
 import { DayTabs, PRE_TRIP_KEY } from "@/components/stats/day-tabs";
 import { AuthRequiredState } from "@/components/layout/auth-required-state";
 import { EmptyState } from "@/components/layout/empty-state";
+import { LoadingState } from "@/components/layout/loading-state";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
 import { formatDateLabel, isPreTripDate } from "@/lib/utils";
 import Link from "next/link";
@@ -37,11 +38,7 @@ export default function StatsPage() {
   const totalTwd = filtered.reduce((s, e) => s + e.amount_twd, 0);
 
   if (loading || ctxLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-sm text-muted-foreground">載入中...</p>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!currentTrip) {

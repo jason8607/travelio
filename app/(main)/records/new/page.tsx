@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
 import { ExpenseForm } from "@/components/expense/expense-form";
+import { LoadingState } from "@/components/layout/loading-state";
 import { useApp } from "@/lib/context";
 import { getGuestExpenses } from "@/lib/guest-storage";
 import { toast } from "sonner";
@@ -46,11 +47,7 @@ function ExpensePageContent() {
   }, [editId, isGuest]);
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] text-muted-foreground">
-        載入中...
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return <ExpenseForm editExpense={editExpense} />;
@@ -58,13 +55,7 @@ function ExpensePageContent() {
 
 export default function NewExpensePage() {
   return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-[60vh] text-muted-foreground">
-          載入中...
-        </div>
-      }
-    >
+    <Suspense fallback={<LoadingState />}>
       <ExpensePageContent />
     </Suspense>
   );

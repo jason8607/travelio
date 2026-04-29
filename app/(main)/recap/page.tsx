@@ -1,6 +1,7 @@
 "use client";
 
 import { EmptyState } from "@/components/layout/empty-state";
+import { LoadingState } from "@/components/layout/loading-state";
 import {
   WrappedCard,
   type WrappedCardVariant,
@@ -373,12 +374,7 @@ export default function RecapPage() {
   }
 
   if (loading || ctxLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[60vh] gap-2 text-muted-foreground">
-        <Loader2 className="h-6 w-6 animate-spin" />
-        <span className="text-sm">載入中...</span>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!currentTrip) {
@@ -415,11 +411,10 @@ export default function RecapPage() {
   return (
     <>
       <div className="px-4 pb-8">
-        <div className="text-center pt-2 pb-6">
+        <div className="text-center pt-2 pb-4">
           <div className="text-[11px] tracking-[0.2em] text-muted-foreground">
             WRAPPED · {wrapped.year}
           </div>
-          <div className="text-lg font-bold mt-1">{currentTrip.name}</div>
         </div>
 
         <div className="flex flex-col items-center gap-5">

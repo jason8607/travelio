@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { LoadingState } from "@/components/layout/loading-state";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash2, MapPin } from "lucide-react";
@@ -118,11 +119,7 @@ export default function SchedulePage() {
   const dayLabels = ["日", "一", "二", "三", "四", "五", "六"];
 
   if (!loaded) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] text-muted-foreground">
-        載入中...
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (loadError) {

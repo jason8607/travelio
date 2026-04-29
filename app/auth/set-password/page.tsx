@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { UserIdentity } from "@supabase/supabase-js";
+import { LoadingState } from "@/components/layout/loading-state";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -68,11 +69,7 @@ export default function SetPasswordPage() {
   };
 
   if (checking) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-muted">
-        <div className="text-sm text-muted-foreground">載入中...</div>
-      </div>
-    );
+    return <LoadingState variant="screen" />;
   }
 
   return (

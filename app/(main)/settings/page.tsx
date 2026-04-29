@@ -38,6 +38,7 @@ import { CreditCardManager } from "@/components/settings/credit-card-manager";
 import { CategoryManager } from "@/components/settings/category-manager";
 import { ThemeSwitcher } from "@/components/settings/theme-switcher";
 import { AuthRequiredState } from "@/components/layout/auth-required-state";
+import { LoadingState } from "@/components/layout/loading-state";
 import type { Trip, TripMember, Profile } from "@/types";
 
 export default function SettingsPage() {
@@ -317,11 +318,7 @@ export default function SettingsPage() {
   };
 
   if (ctxLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh] text-muted-foreground">
-        載入中...
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!user && !isGuest) {

@@ -7,6 +7,7 @@ import { MemberSummary } from "@/components/expense/member-summary";
 import { SettlementView } from "@/components/expense/settlement-view";
 import { AuthRequiredState } from "@/components/layout/auth-required-state";
 import { EmptyState } from "@/components/layout/empty-state";
+import { LoadingState } from "@/components/layout/loading-state";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useExpenses } from "@/hooks/use-expenses";
 import { useApp } from "@/lib/context";
@@ -69,11 +70,7 @@ export default function RecordsPage() {
   };
 
   if (loading || ctxLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-sm text-muted-foreground">載入中...</p>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (error) {

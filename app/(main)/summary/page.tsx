@@ -1,6 +1,7 @@
 "use client";
 
 import { EmptyState } from "@/components/layout/empty-state";
+import { LoadingState } from "@/components/layout/loading-state";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { useCategories } from "@/hooks/use-categories";
 import { useCreditCards } from "@/hooks/use-credit-cards";
@@ -270,11 +271,7 @@ export default function SummaryPage() {
   }
 
   if (loading || ctxLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <p className="text-sm text-muted-foreground">載入中...</p>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   if (!currentTrip) {
