@@ -39,12 +39,12 @@ export function ExpenseCard({ expense, onDelete, categories = DEFAULT_CATEGORIES
     : null;
 
   return (
-    <div className="relative flex items-center gap-3 px-4 py-3.5 bg-card rounded-2xl border border-border/60 shadow-sm hover:shadow-md transition-shadow">
+    <div className="relative flex items-center gap-3 px-4 py-3.5 bg-card rounded-xl ring-1 ring-foreground/10 transition-colors">
       {/* 整張卡點擊即為編輯 */}
       <Link
         href={`/records/new?edit=${expense.id}`}
         aria-label={`編輯消費：${expense.title}`}
-        className="absolute inset-0 rounded-2xl z-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+        className="absolute inset-0 rounded-xl z-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       />
 
       {/* Avatar */}

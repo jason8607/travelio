@@ -77,7 +77,7 @@ export default function HomePage() {
         </p>
         <Link
           href="/auth/login"
-          className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-medium"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-3 rounded-xl font-medium"
         >
           開始使用
         </Link>
@@ -149,7 +149,7 @@ export default function HomePage() {
 
       {/* 匯率 pill */}
       <div className="flex justify-start px-5 pb-4">
-        <div className="inline-flex items-center gap-2 rounded-full bg-card border border-border/60 px-4 py-1.5 shadow-sm">
+        <div className="inline-flex items-center gap-2 rounded-full bg-card ring-1 ring-foreground/10 px-4 py-1.5">
           <span className="w-2 h-2 rounded-full bg-success" />
           <span className="text-xs text-muted-foreground">JPY 100</span>
           <span className="text-xs text-muted-foreground/60">≈</span>
@@ -169,14 +169,14 @@ export default function HomePage() {
 
       {/* 2 small cards: 今日 / 回饋 */}
       <div className="grid grid-cols-2 gap-3 px-4 mt-3">
-        <div className="rounded-2xl bg-card border border-border/60 px-4 py-3.5 shadow-sm">
+        <div className="rounded-xl bg-card ring-1 ring-foreground/10 px-4 py-3.5">
           <p className="text-[11px] text-muted-foreground font-medium">今日</p>
           <p className="text-xl font-bold text-foreground tracking-tight mt-1.5">
             {formatJPY(todayTotal)}
           </p>
         </div>
         <Link href="/stats" className="block">
-          <div className="rounded-2xl bg-card border border-border/60 px-4 py-3.5 shadow-sm h-full">
+          <div className="rounded-xl bg-card ring-1 ring-foreground/10 px-4 py-3.5 h-full">
             <p className="text-[11px] text-muted-foreground font-medium">回饋</p>
             <p className="text-xl font-bold text-success tracking-tight mt-1.5">
               {cards.length > 0 ? formatTWD(cashbackTotal) : "—"}
@@ -221,7 +221,7 @@ export default function HomePage() {
       <Link
         href="/records/new"
         aria-label="新增消費"
-        className="absolute right-4 bottom-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-lg hover:bg-primary/90 transition-all active:scale-95"
+        className="absolute right-4 bottom-4 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg hover:bg-primary/90 transition-all active:translate-y-px"
       >
         <Plus className="h-6 w-6" />
       </Link>

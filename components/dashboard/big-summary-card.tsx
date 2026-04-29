@@ -25,7 +25,7 @@ export function BigSummaryCard({
 
   return (
     <Link href="/records" className="block mx-4">
-      <div className="rounded-3xl bg-card p-5 shadow-sm border border-border/60">
+      <div className="rounded-xl bg-card p-5 ring-1 ring-foreground/10">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-xs text-muted-foreground font-medium">旅程總支出</p>
@@ -36,7 +36,7 @@ export function BigSummaryCard({
               ≈ {formatTWD(totalTwd)}
             </p>
           </div>
-          <div className="shrink-0 flex flex-col items-center justify-center rounded-2xl bg-muted px-3 py-2.5 min-w-[52px]">
+          <div className="shrink-0 flex flex-col items-center justify-center rounded-lg bg-muted px-3 py-2.5 min-w-[52px]">
             <p className="text-xl font-bold text-foreground leading-none">{count}</p>
             <p className="text-[10px] text-muted-foreground mt-0.5">筆</p>
           </div>
