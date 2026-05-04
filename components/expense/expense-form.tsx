@@ -13,18 +13,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { useApp } from "@/lib/context";
-import { getExchangeRate, jpyToTwd, twdToJpy } from "@/lib/exchange-rate";
+import { FALLBACK_RATE, getExchangeRate, jpyToTwd, twdToJpy } from "@/lib/exchange-rate";
 import { addGuestExpense, deleteGuestExpense, updateGuestExpense } from "@/lib/guest-storage";
-import { cn, getPreTripDate, isPreTripDate } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import type { Category, Expense, PaymentMethod, SplitType } from "@/types";
 import { Image as ImageIcon, MapPin, Store, Trash2, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Textarea } from "../ui/textarea";
 import { CategoryGrid } from "./category-grid";
 import { CreditCardPicker } from "./credit-card-picker";
 import { PaymentChips } from "./payment-chips";
+
+const AMOUNT_MAX = 9_999_999;
 
 interface ExpenseFormProps {
   editExpense?: Expense | null;
@@ -75,6 +77,26 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [previewRate, setPreviewRate] = useState<number>(
+    editExpense?.exchange_rate ?? FALLBACK_RATE
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    getExchangeRate().then((rate) => {
+      if (!cancelled) setPreviewRate(rate);
+    });
+    return () => { cancelled = true; };
+  }, []);
+
+  const numericAmount = Number(amount);
+  const hasValidAmount = amount !== "" && Number.isFinite(numericAmount) && numericAmount > 0;
+  const isOverLimit = hasValidAmount && numericAmount > AMOUNT_MAX;
+  const previewConversion = hasValidAmount && !isOverLimit
+    ? currency === "JPY"
+      ? `≈ NT$ ${jpyToTwd(numericAmount, previewRate).toLocaleString()}`
+      : `≈ ¥ ${twdToJpy(numericAmount, previewRate).toLocaleString()}`
+    : null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -86,11 +108,19 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
       toast.error("請先登入");
       return;
     }
+    if (!hasValidAmount) {
+      toast.error("請輸入有效金額");
+      return;
+    }
+    if (isOverLimit) {
+      toast.error(`金額不可超過 ${AMOUNT_MAX.toLocaleString()}`);
+      return;
+    }
     setSaving(true);
 
     try {
       const rate = await getExchangeRate();
-      const inputAmount = Number(amount);
+      const inputAmount = currency === "JPY" ? Math.round(numericAmount) : numericAmount;
       const jpy = currency === "JPY" ? inputAmount : twdToJpy(inputAmount, rate);
       const twd = currency === "TWD" ? inputAmount : jpyToTwd(inputAmount, rate);
 
@@ -286,10 +316,10 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
               type="button"
               onClick={() => setCurrency(val)}
               className={cn(
-                "flex-1 py-2.5 rounded-xl border-2 text-sm font-medium transition-all",
+                "flex-1 py-2.5 rounded-xl ring-1 text-sm font-medium transition-colors",
                 currency === val
-                  ? "border-primary/50 bg-primary/10 text-primary"
-                  : "border-border/60 bg-card text-muted-foreground hover:bg-muted"
+                  ? "bg-accent ring-primary text-primary"
+                  : "bg-card ring-border text-muted-foreground hover:bg-muted"
               )}
             >
               {label}
@@ -298,50 +328,47 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
         </div>
       </div>
 
-      {/* 金額 + 日期 */}
-      <div className="grid grid-cols-2 gap-3">
-        <div className="space-y-1.5">
-          <Label htmlFor="amount" className="text-sm font-medium text-muted-foreground">
-            金額 ({currency === "JPY" ? "¥" : "NT$"})
-          </Label>
-          <Input
-            id="amount"
-            type="number"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="0"
-            required
-            min={0}
-            className="h-12 rounded-xl border-border text-xl font-bold focus-visible:ring-primary"
-          />
-        </div>
-        <div className="space-y-1.5">
-          <Label htmlFor="date" className="text-sm font-medium text-muted-foreground">日期</Label>
-          <Input
-            id="date"
-            type="date"
-            value={expenseDate}
-            onChange={(e) => setExpenseDate(e.target.value)}
-            className="h-12 rounded-xl border-border focus-visible:ring-primary"
-          />
-          {currentTrip && (
-            <button
-              type="button"
-              onClick={() => {
-                const pre = getPreTripDate(currentTrip.start_date);
-                setExpenseDate(expenseDate === pre ? new Date().toISOString().slice(0, 10) : pre);
-              }}
-              className={cn(
-                "text-xs px-2.5 py-1 rounded-full transition-colors",
-                currentTrip && isPreTripDate(expenseDate, currentTrip.start_date)
-                  ? "bg-primary/10 text-primary font-medium"
-                  : "bg-card text-muted-foreground ring-1 ring-border hover:bg-accent hover:text-accent-foreground"
-              )}
-            >
-              ✈️ 行前
-            </button>
+      {/* 金額 (hero) */}
+      <div className="space-y-1.5">
+        <Label htmlFor="amount" className="text-sm font-medium text-muted-foreground">
+          金額 ({currency === "JPY" ? "¥" : "NT$"})
+        </Label>
+        <Input
+          id="amount"
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          placeholder="0"
+          required
+          min={1}
+          max={AMOUNT_MAX}
+          step={currency === "JPY" ? 1 : 0.01}
+          inputMode={currency === "JPY" ? "numeric" : "decimal"}
+          enterKeyHint="next"
+          aria-invalid={isOverLimit || undefined}
+          className="h-12 rounded-xl border-border text-2xl font-semibold tabular-nums focus-visible:ring-primary"
+        />
+        <div className="flex min-h-5 items-center justify-between text-xs tabular-nums">
+          {isOverLimit ? (
+            <span className="text-destructive">金額不可超過 {AMOUNT_MAX.toLocaleString()}</span>
+          ) : previewConversion ? (
+            <span className="text-muted-foreground">{previewConversion}</span>
+          ) : (
+            <span aria-hidden />
           )}
         </div>
+      </div>
+
+      {/* 日期 */}
+      <div className="space-y-1.5">
+        <Label htmlFor="date" className="text-sm font-medium text-muted-foreground">日期</Label>
+        <Input
+          id="date"
+          type="date"
+          value={expenseDate}
+          onChange={(e) => setExpenseDate(e.target.value)}
+          className="h-12 rounded-xl border-border focus-visible:ring-primary"
+        />
       </div>
 
       {/* 類別選擇 - 圖示網格 */}
@@ -436,10 +463,10 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
                     setOwnerId(isMe ? null : m.user_id);
                   }}
                   className={cn(
-                    "flex items-center gap-1.5 px-3 py-2.5 rounded-xl border-2 transition-all duration-200 text-sm font-medium",
+                    "flex items-center gap-1.5 px-3 py-2.5 rounded-xl ring-1 transition-colors text-sm font-medium",
                     isSelected
-                      ? "border-primary/50 bg-primary/10 text-primary"
-                      : "border-border/60 bg-card text-muted-foreground hover:bg-muted"
+                      ? "bg-accent ring-primary text-primary"
+                      : "bg-card ring-border text-muted-foreground hover:bg-muted"
                   )}
                 >
                   <UserAvatar avatarUrl={m.profile?.avatar_url} avatarEmoji={m.profile?.avatar_emoji} size="xs" />
@@ -454,10 +481,10 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
                 setOwnerId(null);
               }}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-2.5 rounded-xl border-2 transition-all duration-200 text-sm font-medium",
+                "flex items-center gap-1.5 px-3 py-2.5 rounded-xl ring-1 transition-colors text-sm font-medium",
                 splitType === "split"
-                  ? "border-primary/50 bg-primary/10 text-primary"
-                  : "border-border/60 bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  ? "bg-accent ring-primary text-primary"
+                  : "bg-card ring-border text-muted-foreground hover:bg-muted"
               )}
             >
               <Users className="h-4 w-4" />
@@ -485,10 +512,10 @@ export function ExpenseForm({ editExpense }: ExpenseFormProps) {
                   type="button"
                   onClick={() => setPaidBy(m.user_id)}
                   className={cn(
-                    "flex items-center gap-1.5 px-3 py-2.5 rounded-xl border-2 transition-all duration-200 text-sm font-medium",
+                    "flex items-center gap-1.5 px-3 py-2.5 rounded-xl ring-1 transition-colors text-sm font-medium",
                     isSelected
-                      ? "border-primary/50 bg-primary/10 text-primary"
-                      : "border-border/60 bg-card text-muted-foreground hover:bg-muted"
+                      ? "bg-accent ring-primary text-primary"
+                      : "bg-card ring-border text-muted-foreground hover:bg-muted"
                   )}
                 >
                   <UserAvatar avatarUrl={m.profile?.avatar_url} avatarEmoji={m.profile?.avatar_emoji} size="xs" />

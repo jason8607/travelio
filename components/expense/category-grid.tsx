@@ -19,10 +19,10 @@ export function CategoryGrid({ value, onChange }: CategoryGridProps) {
           type="button"
           onClick={() => onChange(cat.value)}
           className={cn(
-            "flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl border-2 transition-all duration-200",
+            "flex flex-col items-center justify-center gap-1 p-2.5 rounded-xl ring-1 transition-colors",
             value === cat.value
-              ? "border-primary/50 bg-primary/10 shadow-sm"
-              : "border-border/60 bg-card hover:bg-muted"
+              ? "bg-accent ring-primary"
+              : "bg-card ring-border hover:bg-muted"
           )}
         >
           <span className="text-2xl leading-none">{cat.icon}</span>

@@ -19,8 +19,8 @@ export function CreditCardPicker({ value, onChange, planValue, onPlanChange }: C
 
   if (cards.length === 0) {
     return (
-      <div className="rounded-xl bg-primary/10 border border-primary/20 p-3 flex items-center justify-between">
-        <p className="text-xs text-primary">尚未設定信用卡</p>
+      <div className="rounded-xl bg-muted ring-1 ring-border p-3 flex items-center justify-between">
+        <p className="text-xs text-muted-foreground">尚未設定信用卡</p>
         <Link
           href="/settings"
           className="text-xs text-primary font-medium flex items-center gap-1 hover:underline"
@@ -69,10 +69,10 @@ export function CreditCardPicker({ value, onChange, planValue, onPlanChange }: C
                 }
               }}
               className={cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-full border-2 transition-all duration-200 text-sm",
+                "flex items-center gap-1.5 px-3 py-2 rounded-xl ring-1 transition-colors text-sm",
                 isSelected
-                  ? "border-primary/50 bg-primary/10 text-primary font-medium"
-                  : "border-border/60 bg-card text-muted-foreground hover:bg-muted"
+                  ? "bg-accent ring-primary text-primary font-medium"
+                  : "bg-card ring-border text-muted-foreground hover:bg-muted"
               )}
             >
               <span className="text-base leading-none">💳</span>
@@ -94,10 +94,10 @@ export function CreditCardPicker({ value, onChange, planValue, onPlanChange }: C
               type="button"
               onClick={() => onPlanChange?.(plan.id)}
               className={cn(
-                "px-2.5 py-1.5 rounded-lg border transition-all duration-200 text-xs",
+                "px-2.5 py-1.5 rounded-lg ring-1 transition-colors text-xs",
                 planValue === plan.id
-                  ? "border-primary/50 bg-primary/10 text-primary font-medium"
-                  : "border-border/60 bg-card text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                  ? "bg-accent ring-primary text-primary font-medium"
+                  : "bg-card ring-border text-muted-foreground hover:bg-muted"
               )}
             >
               {plan.name}
