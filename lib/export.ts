@@ -7,11 +7,11 @@ function escapeCSV(value: string): string {
   return value;
 }
 
-export function exportExpensesToCSV(
+export function buildExpensesCsv(
   expenses: Expense[],
   tripName: string,
   members: TripMember[]
-) {
+): { blob: Blob; filename: string } {
   const memberMap = new Map(
     members.map((m) => [m.user_id, m.profile?.display_name || "成員"])
   );
@@ -66,10 +66,5 @@ export function exportExpensesToCSV(
     [headers, ...rows].map((row) => row.map(escapeCSV).join(",")).join("\n");
 
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${tripName}_消費紀錄.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
+  return { blob, filename: `${tripName}_消費紀錄.csv` };
 }

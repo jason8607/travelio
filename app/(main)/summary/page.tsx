@@ -8,9 +8,9 @@ import { useCreditCards } from "@/hooks/use-credit-cards";
 import { useExpenses } from "@/hooks/use-expenses";
 import { useApp } from "@/lib/context";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
-import { exportExpensesToCSV } from "@/lib/export";
+import { buildExpensesCsv } from "@/lib/export";
 import { calculateSettlements } from "@/lib/settlement";
-import { shareOrDownloadImage } from "@/lib/share-image";
+import { shareOrDownloadFile } from "@/lib/share-image";
 import { differenceInDays, format, parseISO } from "date-fns";
 import {
   ArrowRight,
@@ -255,7 +255,7 @@ export default function SummaryPage() {
       const res = await fetch(dataUrl);
       const blob = await res.blob();
 
-      const result = await shareOrDownloadImage(
+      const result = await shareOrDownloadFile(
         blob,
         `${currentTrip.name}-總結.png`,
         `${currentTrip.name} 旅行總結`
@@ -580,9 +580,25 @@ export default function SummaryPage() {
 
       {/* Export button */}
       <button
-        onClick={() => {
-          exportExpensesToCSV(expenses, currentTrip.name, tripMembers);
-          toast.success("CSV 已下載");
+        onClick={async () => {
+          try {
+            const { blob, filename } = buildExpensesCsv(
+              expenses,
+              currentTrip.name,
+              tripMembers
+            );
+            const result = await shareOrDownloadFile(
+              blob,
+              filename,
+              `${currentTrip.name} · 消費紀錄`
+            );
+            if (result === "downloaded") toast.success("CSV 已下載");
+          } catch (err) {
+            console.error("CSV export error:", err);
+            toast.error(
+              `匯出失敗：${err instanceof Error ? err.message : "未知錯誤"}`
+            );
+          }
         }}
         className="w-full flex items-center justify-center gap-2 rounded-xl border border-border bg-card py-3 text-sm font-medium text-muted-foreground hover:bg-muted shadow-sm transition-colors"
       >

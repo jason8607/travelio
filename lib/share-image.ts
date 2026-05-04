@@ -66,16 +66,30 @@ export async function shareImageNative(
   }
 }
 
-export async function shareOrDownloadImage(
+export async function shareOrDownloadFile(
   blob: Blob,
   filename: string,
   shareTitle: string
 ): Promise<"shared" | "downloaded"> {
-  if (isTouchDevice() && canShareImage()) {
-    const file = new File([blob], filename, { type: blob.type || "image/png" });
+  // iOS standalone PWA always prefers share — `<a download>` opens an in-app
+  // preview pane there instead of saving.
+  const preferShare = isTouchDevice() || isIosStandalone();
+  if (preferShare && canShareImage()) {
+    // Strip charset from mime so Chrome's strict allowlist (e.g. "text/csv")
+    // can match files generated with "text/csv;charset=utf-8".
+    const mime = (blob.type || "application/octet-stream").split(";")[0].trim();
+    const file = new File([blob], filename, { type: mime });
     if (navigator.canShare({ files: [file] })) {
-      await navigator.share({ files: [file], title: shareTitle });
-      return "shared";
+      try {
+        await navigator.share({ files: [file], title: shareTitle });
+        return "shared";
+      } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return "shared";
+        // Some environments (desktop browsers under DevTools mobile emulation,
+        // permission-denied contexts) reject share even after canShare → true.
+        // Fall through to download instead of surfacing the error.
+        console.warn("Web Share failed, falling back to download:", err);
+      }
     }
   }
 
