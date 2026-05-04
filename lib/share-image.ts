@@ -8,6 +8,21 @@ export function isTouchDevice(): boolean {
   return primaryCoarse && !hasFinePointer;
 }
 
+// iOS standalone PWA can't trigger a real file download — `<a download>` opens
+// an in-app preview pane instead of saving. Detect this so the recap page can
+// route the "download" intent through Web Share API (which exposes 儲存影像).
+export function isIosStandalone(): boolean {
+  if (typeof window === "undefined") return false;
+  const ua = window.navigator.userAgent;
+  const isIos = /iPad|iPhone|iPod/.test(ua) ||
+    (ua.includes("Mac") && "ontouchend" in document);
+  if (!isIos) return false;
+  const standalone =
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (window.navigator as unknown as { standalone?: boolean }).standalone === true;
+  return standalone;
+}
+
 export function canCopyImage(): boolean {
   if (typeof navigator === "undefined") return false;
   if (typeof ClipboardItem === "undefined") return false;

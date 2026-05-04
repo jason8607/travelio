@@ -15,6 +15,7 @@ import {
   canShareImage,
   copyImageToClipboard,
   downloadImage,
+  isIosStandalone,
   isTouchDevice,
   shareImageNative,
 } from "@/lib/share-image";
@@ -305,15 +306,18 @@ export default function RecapPage() {
     const node = cardRefs.current[idx];
     if (!node) return null;
     const { toPng } = await import("html-to-image");
-    // iOS Safari workaround: html-to-image sometimes skips embedded images
-    // on the first pass, so run it a few times before using the result.
-    await toPng(node, { pixelRatio: 2, quality: 1, cacheBust: true });
-    await toPng(node, { pixelRatio: 2, quality: 1, cacheBust: true });
-    const dataUrl = await toPng(node, {
+    const opts = {
       pixelRatio: 2,
       quality: 1,
       cacheBust: true,
-    });
+      filter: (n: HTMLElement) =>
+        !(n instanceof HTMLElement && n.dataset.exportHide === "true"),
+    };
+    // iOS Safari workaround: html-to-image sometimes skips embedded images
+    // on the first pass, so run it a few times before using the result.
+    await toPng(node, opts);
+    await toPng(node, opts);
+    const dataUrl = await toPng(node, opts);
     const res = await fetch(dataUrl);
     return await res.blob();
   }
@@ -321,11 +325,26 @@ export default function RecapPage() {
   async function handleDownload() {
     if (!wrapped || !currentTrip) return;
     const current = wrapped.cards[idx];
+    const filename = `${currentTrip.name}-${current.title}.png`;
     setDownloading(true);
     try {
       const blob = await captureBlob();
       if (!blob) return;
-      downloadImage(blob, `${currentTrip.name}-${current.title}.png`);
+      // iOS standalone PWA can't trigger <a download>; route through share
+      // sheet so 儲存影像 saves to Photos.
+      if (isIosStandalone() && canShareImage()) {
+        const result = await shareImageNative(
+          blob,
+          filename,
+          `${currentTrip.name} · ${current.title}`
+        );
+        if (result === "unsupported") {
+          downloadImage(blob, filename);
+          toast.success("圖片已儲存");
+        }
+        return;
+      }
+      downloadImage(blob, filename);
       toast.success("圖片已儲存");
     } catch (err) {
       console.error("Download error:", err);

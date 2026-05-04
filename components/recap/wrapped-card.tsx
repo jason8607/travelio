@@ -220,7 +220,7 @@ export const WrappedCard = forwardRef<HTMLDivElement, WrappedCardProps>(
           decorText={decorText}
         />
 
-        <div style={{ position: "absolute", top: 22, left: 18, right: 18, display: "flex", gap: 3, zIndex: 3 }}>
+        <div data-export-hide="true" style={{ position: "absolute", top: 22, left: 18, right: 18, display: "flex", gap: 3, zIndex: 3 }}>
           {Array.from({ length: total }).map((_, i) => (
             <div
               key={i}
@@ -234,10 +234,12 @@ export const WrappedCard = forwardRef<HTMLDivElement, WrappedCardProps>(
           ))}
         </div>
 
-        <div style={{ position: "absolute", top: 38, left: 26, right: 26, zIndex: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <MetaText color={palette.fg}>
-            RECAP · {String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
-          </MetaText>
+        <div data-export-hide="true" style={{ position: "absolute", top: 38, left: 26, right: 26, zIndex: 3, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <span>
+            <MetaText color={palette.fg}>
+              RECAP · {String(index + 1).padStart(2, "0")}/{String(total).padStart(2, "0")}
+            </MetaText>
+          </span>
           <MetaText color={palette.fg}>{year}</MetaText>
         </div>
 
