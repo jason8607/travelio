@@ -7,6 +7,7 @@ import { UserAvatar } from "@/components/ui/user-avatar";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
 import { ChevronDown, ChevronUp, ReceiptText, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useCategories } from "@/hooks/use-categories";
 import type { Expense, TripMember } from "@/types";
 
 interface MemberSummaryProps {
@@ -32,6 +33,7 @@ function getExpenseOwner(expense: Expense): string | "split" {
 
 export function MemberSummary({ expenses, tripMembers, onDelete }: MemberSummaryProps) {
   const [expandedMember, setExpandedMember] = useState<string | null>(null);
+  const { categories } = useCategories();
 
   const { breakdowns, totalSplitJpy, perPersonSplitJpy, perPersonSplitTwd } = useMemo(() => {
     const memberCount = tripMembers.length || 1;
@@ -142,7 +144,12 @@ export function MemberSummary({ expenses, tripMembers, onDelete }: MemberSummary
                       個人消費（{m.items.length} 筆）
                     </p>
                     {m.items.map((expense) => (
-                      <ExpenseCard key={expense.id} expense={expense} onDelete={onDelete} />
+                      <ExpenseCard
+                        key={expense.id}
+                        expense={expense}
+                        onDelete={onDelete}
+                        categories={categories}
+                      />
                     ))}
                   </>
                 ) : (

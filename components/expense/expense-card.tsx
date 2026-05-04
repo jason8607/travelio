@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Trash2, Users, ArrowRight, Image as ImageIcon } from "lucide-react";
+import { Trash2, Users, Image as ImageIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { UserAvatar } from "@/components/ui/user-avatar";
 import { formatJPY, formatTWD } from "@/lib/exchange-rate";
-import { PAYMENT_METHODS, DEFAULT_CATEGORIES } from "@/types";
-import { PaymentIcon } from "@/components/expense/payment-icon";
+import { DEFAULT_CATEGORIES } from "@/types";
 import type { Expense, CategoryItem } from "@/types";
-import { useApp } from "@/lib/context";
 import Link from "next/link";
 import {
   Dialog,
@@ -26,105 +24,73 @@ interface ExpenseCardProps {
   categories?: CategoryItem[];
 }
 
+const FALLBACK_CATEGORY = DEFAULT_CATEGORIES.find((c) => c.value === "其他") ?? DEFAULT_CATEGORIES[0];
+
 export function ExpenseCard({ expense, onDelete, categories = DEFAULT_CATEGORIES }: ExpenseCardProps) {
-  const { tripMembers } = useApp();
   const [deleting, setDeleting] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const categoryInfo = categories.find((c) => c.value === expense.category);
-  const paymentInfo = PAYMENT_METHODS.find((p) => p.value === expense.payment_method);
-
-  const ownerMember = expense.owner_id
-    ? tripMembers.find((m) => m.user_id === expense.owner_id)
-    : null;
+  const categoryColor = categoryInfo?.color ?? FALLBACK_CATEGORY.color;
+  const categoryIcon = categoryInfo?.icon ?? FALLBACK_CATEGORY.icon;
 
   return (
     <div className="relative flex items-center gap-3 px-4 py-3.5 bg-card rounded-xl ring-1 ring-foreground/10 transition-colors">
-      {/* 整張卡點擊即為編輯 */}
       <Link
         href={`/records/new?edit=${expense.id}`}
         aria-label={`編輯消費：${expense.title}`}
         className="absolute inset-0 rounded-xl z-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       />
 
-      {/* Avatar */}
       <UserAvatar
         avatarUrl={expense.profile?.avatar_url}
         avatarEmoji={expense.profile?.avatar_emoji}
         size="md"
       />
 
-      {/* Content */}
       <div className="flex-1 min-w-0 pointer-events-none">
         <p className="font-semibold text-sm text-foreground truncate">{expense.title}</p>
-        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+        <div className="flex items-center gap-1.5 mt-1">
           <Badge
             variant="secondary"
             className="text-[10px] px-1.5 py-0 h-[18px] gap-0.5 font-medium"
             style={{
-              backgroundColor: categoryInfo?.color + "18",
-              color: categoryInfo?.color,
+              backgroundColor: `${categoryColor}18`,
+              color: categoryColor,
             }}
           >
-            {categoryInfo?.icon} {expense.category}
+            {categoryIcon} {expense.category}
           </Badge>
-          <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
-            <PaymentIcon method={expense.payment_method} size={12} />
-            {expense.payment_method}
-          </span>
           {expense.split_type === "split" && (
-            <span className="inline-flex items-center gap-0.5 text-[10px] text-primary bg-primary/10 px-1.5 py-0 rounded-full font-medium">
-              <Users className="h-2.5 w-2.5" />均分
-            </span>
-          )}
-          {ownerMember && (
-            <span className="inline-flex items-center gap-0.5 text-[10px] text-accent-foreground bg-accent px-1.5 py-0 rounded-full font-medium">
-              <ArrowRight className="h-2.5 w-2.5" />
-              {ownerMember.profile?.avatar_emoji || "🧑"} {ownerMember.profile?.display_name || "成員"}
-            </span>
-          )}
-          {expense.receipt_image_url && (
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setShowReceipt(true);
-              }}
-              className="pointer-events-auto relative z-10 inline-flex items-center gap-0.5 text-[10px] text-primary bg-primary/10 px-1.5 py-0 rounded-full font-medium hover:bg-primary/15 transition-colors"
-            >
-              <ImageIcon className="h-2.5 w-2.5" />收據
-            </button>
-          )}
-          {expense.store_name && (
-            <>
-              <span className="text-[10px] text-muted-foreground">·</span>
-              <span className="text-[10px] text-muted-foreground truncate">
-                🏪 {expense.store_name}
-              </span>
-            </>
-          )}
-          {expense.note && (
-            <>
-              <span className="text-[10px] text-muted-foreground">·</span>
-              <span className="text-[10px] text-muted-foreground truncate italic">
-                {expense.note}
-              </span>
-            </>
+            <Users className="h-3 w-3 text-muted-foreground" aria-label="均分" />
           )}
         </div>
       </div>
 
-      {/* Amount */}
       <div className="shrink-0 text-right pointer-events-none">
-        <p className="font-bold text-sm text-foreground">{formatJPY(expense.amount_jpy)}</p>
-        <p className="text-[10px] text-muted-foreground">
+        <p className="font-bold text-sm text-foreground tabular-nums">
+          {formatJPY(expense.amount_jpy)}
+        </p>
+        <p className="text-[10px] text-muted-foreground tabular-nums">
           {formatTWD(expense.amount_twd)}
         </p>
       </div>
 
-      {/* Actions */}
-      {onDelete && (
-        <div className="shrink-0 flex items-center relative z-10">
+      <div className="shrink-0 flex items-center gap-0.5 relative z-10">
+        {expense.receipt_image_url && (
+          <button
+            type="button"
+            aria-label="檢視收據"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowReceipt(true);
+            }}
+            className="min-h-11 min-w-11 flex items-center justify-center text-muted-foreground/60 hover:text-foreground transition-colors"
+          >
+            <ImageIcon className="h-3.5 w-3.5" />
+          </button>
+        )}
+        {onDelete && (
           <button
             type="button"
             aria-label="刪除消費"
@@ -137,8 +103,8 @@ export function ExpenseCard({ expense, onDelete, categories = DEFAULT_CATEGORIES
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
-        </div>
-      )}
+        )}
+      </div>
 
       {expense.receipt_image_url && (
         <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
@@ -170,7 +136,7 @@ export function ExpenseCard({ expense, onDelete, categories = DEFAULT_CATEGORIES
               取消
             </Button>
             <Button
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+              variant="destructive"
               disabled={deleting}
               onClick={async () => {
                 setShowDeleteDialog(false);
