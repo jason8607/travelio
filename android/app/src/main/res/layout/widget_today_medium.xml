@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@drawable/widget_bg_rounded"
+    android:padding="12dp">
+
+    <!-- Left column -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="今日花費"
+            android:textColor="@color/widget_smoke"
+            android:textSize="11sp" />
+
+        <TextView
+            android:id="@+id/spent_jpy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¥0"
+            android:textColor="@color/widget_ink"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:layout_marginTop="2dp" />
+
+        <TextView
+            android:id="@+id/spent_twd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NT$0"
+            android:textColor="@color/widget_smoke"
+            android:textSize="11sp" />
+
+        <ProgressBar
+            android:id="@+id/budget_bar_blue"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:progressDrawable="@drawable/widget_progress_blue"
+            android:max="100"
+            android:progress="0"
+            android:layout_marginTop="8dp" />
+
+        <ProgressBar
+            android:id="@+id/budget_bar_red"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="6dp"
+            android:progressDrawable="@drawable/widget_progress_red"
+            android:max="100"
+            android:progress="0"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/trip_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="@color/widget_smoke"
+            android:textSize="10sp"
+            android:layout_marginTop="4dp"
+            android:maxLines="1"
+            android:ellipsize="end" />
+
+    </LinearLayout>
+
+    <!-- Divider -->
+    <View
+        android:layout_width="1dp"
+        android:layout_height="match_parent"
+        android:background="@color/widget_hairline"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp" />
+
+    <!-- Right column: categories -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+
+        <!-- 4 category rows -->
+        <LinearLayout android:id="@+id/cat_row_0"
+            android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView android:id="@+id/cat_icon_0"
+                android:layout_width="20dp" android:layout_height="wrap_content"
+                android:textSize="13sp" android:text="" />
+            <TextView android:id="@+id/cat_label_0"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:textSize="11sp"
+                android:textColor="@color/widget_smoke" android:text=""
+                android:layout_marginStart="2dp" />
+            <TextView android:id="@+id/cat_amount_0"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textSize="11sp" android:textColor="@color/widget_ink"
+                android:textStyle="bold" android:text="" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cat_row_1"
+            android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView android:id="@+id/cat_icon_1"
+                android:layout_width="20dp" android:layout_height="wrap_content"
+                android:textSize="13sp" android:text="" />
+            <TextView android:id="@+id/cat_label_1"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:textSize="11sp"
+                android:textColor="@color/widget_smoke" android:text=""
+                android:layout_marginStart="2dp" />
+            <TextView android:id="@+id/cat_amount_1"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textSize="11sp" android:textColor="@color/widget_ink"
+                android:textStyle="bold" android:text="" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cat_row_2"
+            android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView android:id="@+id/cat_icon_2"
+                android:layout_width="20dp" android:layout_height="wrap_content"
+                android:textSize="13sp" android:text="" />
+            <TextView android:id="@+id/cat_label_2"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:textSize="11sp"
+                android:textColor="@color/widget_smoke" android:text=""
+                android:layout_marginStart="2dp" />
+            <TextView android:id="@+id/cat_amount_2"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textSize="11sp" android:textColor="@color/widget_ink"
+                android:textStyle="bold" android:text="" />
+        </LinearLayout>
+
+        <LinearLayout android:id="@+id/cat_row_3"
+            android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_weight="1" android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView android:id="@+id/cat_icon_3"
+                android:layout_width="20dp" android:layout_height="wrap_content"
+                android:textSize="13sp" android:text="" />
+            <TextView android:id="@+id/cat_label_3"
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:layout_weight="1" android:textSize="11sp"
+                android:textColor="@color/widget_smoke" android:text=""
+                android:layout_marginStart="2dp" />
+            <TextView android:id="@+id/cat_amount_3"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textSize="11sp" android:textColor="@color/widget_ink"
+                android:textStyle="bold" android:text="" />
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

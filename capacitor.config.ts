@@ -27,6 +27,9 @@ const config: CapacitorConfig = {
     scheme: "ryocho",
     appendUserAgent: "RyochoNative",
   },
+  android: {
+    appendUserAgent: "RyochoNative",
+  },
 };
 
 export default config;

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="widget_bg">#FFFFFF</color>
+    <color name="widget_ink">#0F172A</color>
+    <color name="widget_smoke">#64748B</color>
+    <color name="widget_mist">#F1F5F9</color>
+    <color name="widget_hairline">#E2E8F0</color>
+    <color name="widget_blue">#2563EB</color>
+    <color name="widget_sky">#DBEAFE</color>
+    <color name="widget_red">#EF4444</color>
+</resources>
